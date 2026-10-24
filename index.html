@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bARseball.com - Liga Nacional</title>
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- A-Frame, MindAR & Confetti -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#0b0f17] text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-orange-500 selection:text-white">
+  <!-- Notificador flotante de recompensas de monedas -->
+  <div id="floating-coin-container" class="fixed top-20 right-6 z-50 pointer-events-none flex flex-col items-end space-y-2"></div>
+
+  <!-- FONDO CON RESPLANDOR AMBIENTAL -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+    <div class="absolute -top-40 left-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -right-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-20 left-10 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- BARRA DE NAVEGACIÓN MODERNA -->
+  <header class="sticky top-0 z-40 bg-slate-900/70 backdrop-blur-xl border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      
+      <!-- LOGO LIMPIO -->
+      <div class="flex items-center space-x-3 cursor-pointer group" onclick="showPage('inicio')">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-400 p-0.5 flex items-center justify-center shadow-lg shadow-orange-500/25 group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <span class="font-black text-orange-400 text-lg">⚾</span>
+          </div>
+        </div>
+        <span class="font-black text-xl tracking-wider text-slate-100 group-hover:text-amber-300 transition-colors">
+          b<span class="bg-gradient-to-r from-orange-500 to-amber-400 bg-clip-text text-transparent">AR</span>seball
+        </span>
+      </div>
+
+      <!-- MENÚ CENTRAL -->
+      <nav class="hidden lg:flex items-center gap-1 bg-slate-950/60 p-1.5 rounded-2xl border border-white/5 shadow-inner">
+        <button onclick="showPage('inicio')" class="nav-link active px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-white/5">
+          <i data-lucide="home" class="w-4 h-4 text-orange-400"></i>
+          <span>Inicio</span>
+        </button>
+        <button onclick="showPage('juego')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="gamepad-2" class="w-4 h-4 text-amber-400"></i>
+          <span>Mini Juego</span>
+        </button>
+        <button onclick="showPage('torneo')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="trophy" class="w-4 h-4 text-yellow-400"></i>
+          <span>Torneo</span>
+        </button>
+        <button onclick="showPage('trivia')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400"></i>
+          <span>Trivia</span>
+        </button>
+        <button onclick="showPage('estadisticas')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="bar-chart-2" class="w-4 h-4 text-sky-400"></i>
+          <span>Estadísticas</span>
+        </button>
+        <button onclick="showPage('historia')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i>
+          <span>Historia</span>
+        </button>
+        <button onclick="showPage('galeria')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="image" class="w-4 h-4 text-rose-400"></i>
+          <span>Galería</span>
+        </button>
+        <button onclick="showPage('tienda')" class="nav-link px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white hover:bg-white/5">
+          <i data-lucide="shopping-bag" class="w-4 h-4 text-amber-400"></i>
+          <span>Tienda</span>
+        </button>
+      </nav>
+
+      <!-- ACCIONES DE CABECERA -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="openARModal()" class="group relative px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-950 overflow-hidden shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
+          <div class="absolute inset-0 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500 group-hover:opacity-90 transition-opacity"></div>
+          <div class="relative flex items-center space-x-1.5">
+            <i data-lucide="qr-code" class="w-4 h-4 text-slate-950"></i>
+            <span class="hidden sm:inline">Escáner AR</span>
+          </div>
+        </button>
+        
+        <div id="auth-nav-container">
+          <button onclick="showPage('login')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition">
+            Ingresar
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- SECCIÓN INICIO CON HERO MEJORADO -->
+    <section id="page-inicio" class="page-content space-y-8">
+      <div class="bg-gradient-to-r from-slate-800 to-slate-800/40 p-8 rounded-3xl border border-slate-700 flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div class="space-y-4 max-w-xl">
+          <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
+            Liga Nacional
+          </span>
+          <h1 class="text-4xl sm:text-5xl font-black leading-tight">Vive la pasión del béisbol al máximo</h1>
+          <p class="text-slate-400 text-lg">
+            Pon a prueba tus reflejos en el bateo virtual, aprende con las trivias interactivas y edita el contenido multimedia en tiempo real.
+          </p>
+          <div class="flex flex-wrap gap-4 pt-2">
+            <button onclick="showPage('juego')" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-6 py-3 rounded-xl flex items-center space-x-2 transition">
+              <i data-lucide="play" class="w-5 h-5 fill-slate-900"></i>
+              <span>Jugar Ahora</span>
+            </button>
+            <button onclick="openARModal()" class="bg-slate-700 hover:bg-slate-600 font-bold px-6 py-3 rounded-xl flex items-center space-x-2 transition border border-slate-600">
+              <i data-lucide="camera" class="w-5 h-5 text-orange-400"></i>
+              <span>Probar AR</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-[500px] flex flex-col items-center bg-slate-900/90 p-5 rounded-2xl border border-slate-700 shadow-2xl">
+          
+          <!-- PANTALLA DE VIDEO ADAPTABLE PARA FILTROS -->
+          <div class="relative w-full h-[360px] rounded-xl overflow-hidden border border-slate-700 bg-black flex items-center justify-center">
+            <video id="raw-video" class="w-full h-full block object-contain transition-opacity duration-200" autoplay loop muted playsinline>
+              <source src="dominicanpapi.mp4" type="video/mp4">
+            </video>
+            <canvas id="processed-canvas" class="hidden w-full h-full object-contain"></canvas>
+          </div>
+
+          <!-- CONTROLES DE REPRODUCCIÓN Y VOLUMEN -->
+          <div class="w-full flex items-center justify-between gap-4 mt-3 px-2 py-2 bg-slate-800/60 rounded-xl border border-slate-700/50">
+            <button id="btn-play-pause" onclick="togglePlayPause()" class="flex items-center space-x-1.5 text-xs font-bold bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg transition">
+              <i id="icon-play-pause" data-lucide="pause" class="w-4 h-4 text-orange-400"></i>
+              <span id="text-play-pause">Pausar</span>
+            </button>
+
+            <div class="flex items-center space-x-2 flex-1 max-w-[200px]">
+              <i data-lucide="volume-2" class="w-4 h-4 text-slate-400"></i>
+              <input type="range" id="slider-volume" min="0" max="1" step="0.05" value="0" oninput="changeVolume(this.value)" class="w-full accent-orange-500 cursor-pointer">
+            </div>
+          </div>
+
+          <!-- PANEL DE EDICIÓN DE IMAGEN (5 FILTROS) -->
+          <div class="w-full mt-4 space-y-3">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block text-center">Edición de Imagen (5 Filtros)</label>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="applyPreset('blur')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded border border-slate-700 text-slate-200">
+                1. Desenfoque
+              </button>
+              <button onclick="applyPreset('pixel')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded border border-slate-700 text-slate-200">
+                2. Pixelados
+              </button>
+              <button onclick="applyPreset('thermal')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded border border-slate-700 text-slate-200">
+                3. Cámara Térmica
+              </button>
+              <button onclick="applyPreset('custom')" class="bg-slate-800 hover:bg-slate-700 p-2 rounded border border-slate-700 text-slate-200">
+                4. Arcoíris (Ciclo)
+              </button>
+              <button onclick="applyPreset('normal')" class="col-span-2 bg-slate-700 hover:bg-slate-600 p-1 rounded text-slate-300">
+                Restablecer a Normal
+              </button>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-800 text-xs">
+              <span class="font-bold text-slate-300 block text-center">5. Ajuste de Color</span>
+              <div class="flex justify-between text-slate-400">
+                <span>Brillo</span>
+                <input type="range" id="slider-brightness" min="50" max="200" value="100" oninput="updateColorAdjustments()" class="w-2/3 accent-orange-500 cursor-pointer">
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Contraste</span>
+                <input type="range" id="slider-contrast" min="50" max="200" value="100" oninput="updateColorAdjustments()" class="w-2/3 accent-orange-500 cursor-pointer">
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Tono</span>
+                <input type="range" id="slider-hue" min="0" max="360" value="0" oninput="updateColorAdjustments()" class="w-2/3 accent-orange-500 cursor-pointer">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN MINI JUEGO -->
+    <section id="page-juego" class="page-content hidden space-y-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-800 p-6 rounded-2xl border border-slate-700">
+        <div>
+          <h2 class="text-2xl font-black flex items-center space-x-2">
+            <i data-lucide="gamepad-2" class="text-amber-400"></i>
+            <span>Partido de Béisbol - Entrada Completa</span>
+          </h2>
+          <p class="text-sm text-slate-400">Consigue la mayor cantidad de carreras antes de que te canten los <strong>3 Outs</strong> reglamentarios.</p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <button id="btn-start" onclick="startGame()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-5 py-2.5 rounded-xl transition flex items-center space-x-2">
+            <i data-lucide="play" class="w-5 h-5"></i>
+            <span>Play Ball / Iniciar</span>
+          </button>
+          <button id="btn-stop" onclick="stopGame()" disabled class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-5 py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+            <i data-lucide="square" class="w-5 h-5"></i>
+            <span>Detener</span>
+          </button>
+          <button id="btn-swing" onclick="swingBat()" disabled class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-black px-6 py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+            <span>¡BATEAR!</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- MARCADOR DE ESTADIO -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+            <h3 class="font-black text-lg text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+              <span>Scoreboard</span>
+            </h3>
+            <span class="text-xs bg-slate-900 text-orange-400 font-mono px-2 py-1 rounded border border-slate-700">1ra Alta ▲</span>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 grid grid-cols-3 gap-2 text-center">
+            <div>
+              <span class="text-xs font-bold text-slate-400 block">CARRERAS</span>
+              <span id="score-runs" class="text-3xl font-black text-amber-400 font-mono">0</span>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-400 block">HITS</span>
+              <span id="score-hits" class="text-3xl font-black text-sky-400 font-mono">0</span>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-400 block">OUTS</span>
+              <span id="score-outs" class="text-3xl font-black text-rose-500 font-mono">0/3</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/60 space-y-1">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Al Bate</span>
+            <div class="flex items-center justify-between">
+              <span id="current-batter-name" class="font-black text-sm text-slate-100">Cargando...</span>
+              <span id="current-batter-avg" class="text-xs font-mono font-bold text-orange-400">.000 AVG</span>
+            </div>
+          </div>
+
+          <div class="space-y-3 pt-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Lanzamiento:</span>
+              <span id="pitch-type" class="font-bold text-orange-400 font-mono">Esperando...</span>
+            </div>
+
+            <div class="space-y-2 bg-slate-900/50 p-3 rounded-xl border border-slate-800 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-emerald-400">Bolas (4 = Base):</span>
+                <span id="ball-count" class="font-mono font-bold text-emerald-400 text-sm">0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-rose-400">Strikes (3 = Out):</span>
+                <span id="strike-count" class="font-mono font-bold text-rose-400 text-sm">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-700/60 pt-3">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2 text-center">Bases Ocupadas</span>
+            <div class="flex justify-center items-center gap-4 text-xs font-bold">
+              <div id="base-indicator-3" class="px-2.5 py-1 rounded bg-slate-900 text-slate-500 border border-slate-700">3B</div>
+              <div id="base-indicator-2" class="px-2.5 py-1 rounded bg-slate-900 text-slate-500 border border-slate-700">2B</div>
+              <div id="base-indicator-1" class="px-2.5 py-1 rounded bg-slate-900 text-slate-500 border border-slate-700">1B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center relative min-h-[460px]">
+          <canvas id="gameCanvas" width="400" height="460" class="bg-slate-900 rounded-xl border-2 border-slate-700 transition-all duration-300 shadow-2xl"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN TORNEO -->
+    <section id="page-torneo" class="page-content hidden space-y-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-800 p-6 rounded-2xl border border-slate-700">
+        <div>
+          <h2 class="text-2xl font-black text-amber-400 flex items-center space-x-2">
+            <i data-lucide="trophy" class="w-6 h-6"></i>
+            <span>Tabla General de Carreras - Torneo LN</span>
+          </h2>
+          <p class="text-sm text-slate-400 mt-0.5">Clasificación acumulada de los 15 equipos según las carreras anotadas por los usuarios en el mini juego.</p>
+        </div>
+
+        <div class="flex items-center space-x-3 bg-slate-900/80 p-3 rounded-xl border border-slate-700 w-full md:w-auto">
+          <label for="team-selector" class="text-xs font-bold text-slate-300 whitespace-nowrap">Tu Equipo:</label>
+          <select id="team-selector" onchange="changeUserRepresentingTeam(this.value)" class="bg-slate-800 text-slate-100 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-600 focus:outline-none focus:border-orange-500 w-full md:w-60">
+          </select>
+        </div>
+      </div>
+
+      <div id="tournament-leader-card" class="bg-gradient-to-r from-amber-500/20 via-orange-500/10 to-transparent p-6 rounded-2xl border border-amber-500/40 flex items-center justify-between">
+      </div>
+
+      <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+              <tr>
+                <th class="py-3.5 px-4 text-center w-16">Pos</th>
+                <th class="py-3.5 px-4">Franquicia</th>
+                <th class="py-3.5 px-4">División</th>
+                <th class="py-3.5 px-4 text-center">Entradas Jugadas</th>
+                <th class="py-3.5 px-4 text-center font-bold text-amber-400">Carreras Anotadas</th>
+                <th class="py-3.5 px-4 text-right pr-6">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tournament-table-body" class="divide-y divide-slate-700/60">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN TRIVIA -->
+    <section id="page-trivia" class="page-content hidden max-w-2xl mx-auto space-y-6">
+      <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center space-y-2">
+        <h2 class="text-2xl font-black text-emerald-400">Trivia del Béisbol</h2>
+        <p id="trivia-progress" class="text-sm text-slate-400">Pregunta 1 de 10</p>
+      </div>
+
+      <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 space-y-6">
+        <h3 id="trivia-question" class="text-xl font-bold">Cargando pregunta...</h3>
+        <div id="trivia-options" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN ESTADÍSTICAS -->
+    <section id="page-estadisticas" class="page-content hidden space-y-6">
+      <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-700/60 pb-4">
+          <div>
+            <h2 class="text-2xl font-black text-sky-400 flex items-center space-x-2">
+              <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+              <span>Tabla de Posiciones - Liga Nacional</span>
+            </h2>
+            <p id="stats-status-text" class="text-xs text-slate-400 mt-1">Conectando con la API oficial de MLB...</p>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="bg-slate-900/80 p-1 rounded-xl border border-slate-700 flex text-xs font-semibold">
+              <button onclick="filterDivisionTable('all')" id="tab-div-all" class="px-3 py-1.5 rounded-lg bg-orange-500 text-slate-900 transition font-bold">Todas</button>
+              <button onclick="filterDivisionTable('este')" id="tab-div-este" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Este</button>
+              <button onclick="filterDivisionTable('central')" id="tab-div-central" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Central</button>
+              <button onclick="filterDivisionTable('oeste')" id="tab-div-oeste" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Oeste</button>
+            </div>
+
+            <button onclick="loadLiveStandings()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-600">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-sky-400"></i>
+              <span class="hidden sm:inline">Actualizar</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="standings-divisions-container" class="space-y-6"></div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN HISTORIA -->
+    <section id="page-historia" class="page-content hidden space-y-6">
+      <div class="space-y-1 mb-4">
+        <h2 class="text-2xl font-black text-indigo-400">Equipos de la Liga Nacional</h2>
+        <p class="text-xs text-slate-400">Haz clic en cualquier equipo para consultar su información histórica completa.</p>
+      </div>
+      <div id="teams-history-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- SECCIÓN GALERÍA -->
+    <section id="page-galeria" class="page-content hidden space-y-6">
+      <h2 class="text-2xl font-black text-rose-400">Galería de Imágenes</h2>
+      <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+    </section>
+
+    <!-- SECCIÓN AUTENTICACIÓN -->
+    <!-- SECCIÓN TIENDA DE COSMÉTICOS -->
+    <section id="page-tienda" class="page-content hidden space-y-8">
+      <!-- Encabezado de la tienda con wallet y botón de test -->
+      <div class="relative bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 p-6 sm:p-8 rounded-3xl border border-amber-500/30 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center md:text-left">
+          <div class="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold text-amber-400">
+            <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+            <span>Tienda del Club de Béisbol</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">Cosméticos y Personalización</h2>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-xl">
+            Gana monedas jugando al minijuego de bateo (+1 por cada carrera) y desbloquea avatares, marcos y títulos exclusivos para tu perfil.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <!-- Tarjeta de Monedas -->
+          <div class="bg-slate-950/80 border border-amber-500/40 px-5 py-3 rounded-2xl flex items-center space-x-3 shadow-inner w-full sm:w-auto justify-center">
+            <span class="text-2xl">🪙</span>
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase font-black tracking-wider block">Tus Monedas</span>
+              <span id="store-user-coins" class="text-2xl font-black font-mono text-amber-300">0</span>
+            </div>
+          </div>
+
+          <!-- Botón Temporal para Ganar Monedas sin jugar -->
+          <button onclick="claimTestCoins(10)" class="w-full sm:w-auto px-4 py-3 rounded-2xl font-black text-xs sm:text-sm bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:opacity-90 text-slate-950 flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20 active:scale-95 transition transform">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>+10 Monedas (Test)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros de Categoría -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800">
+        <button onclick="setStoreFilter('all')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          Todos los Artículos
+        </button>
+        <button onclick="setStoreFilter('avatars')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          Avatares
+        </button>
+        <button onclick="setStoreFilter('frames')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          Marcos de Perfil
+        </button>
+        <button onclick="setStoreFilter('titles')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          Títulos de Jugador
+        </button>
+      </div>
+
+      <!-- Contenedor dinámico de artículos -->
+      <div id="store-content-container" class="space-y-8"></div>
+    </section>
+
+    <!-- SECCIÓN MI PERFIL -->
+    <section id="page-perfil" class="page-content hidden space-y-8">
+      <!-- Tarjeta del jugador con avatar, marco, título y estadísticas -->
+      <div id="profile-card-container"></div>
+
+      <!-- Sección de Inventario / Armario -->
+      <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-8 rounded-3xl space-y-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-xl font-black text-slate-100 flex items-center gap-2">
+              <i data-lucide="package" class="w-5 h-5 text-orange-400"></i>
+              <span>Tu Armario de Cosméticos</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">
+              Equipa los elementos que has desbloqueado en la tienda para lucirlos en tu perfil.
+            </p>
+          </div>
+
+          <!-- Pestañas de inventario -->
+          <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-slate-800">
+            <button onclick="setProfileTab('avatars')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+              Avatares
+            </button>
+            <button onclick="setProfileTab('frames')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+              Marcos
+            </button>
+            <button onclick="setProfileTab('titles')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition">
+              Títulos
+            </button>
+          </div>
+        </div>
+
+        <div id="profile-inventory-container"></div>
+      </div>
+    </section>
+
+    <section id="page-login" class="page-content hidden max-w-md mx-auto space-y-6">
+      <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 space-y-6">
+        <div class="flex border-b border-slate-700 pb-2">
+          <button id="tab-login-btn" onclick="toggleAuthTab('login')" class="flex-1 text-center font-bold text-orange-400 border-b-2 border-orange-500 pb-2 transition">
+            Iniciar Sesión
+          </button>
+          <button id="tab-register-btn" onclick="toggleAuthTab('register')" class="flex-1 text-center font-bold text-slate-400 pb-2 hover:text-slate-200 transition">
+            Registrarse
+          </button>
+        </div>
+
+        <div id="auth-alert" class="hidden p-3 rounded-xl text-xs font-medium border"></div>
+
+        <form id="form-login" onsubmit="handleAuthSubmit(event, 'login')" class="space-y-4">
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Correo Electrónico</label>
+            <input type="email" id="login-email" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-orange-500 text-slate-100">
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Contraseña</label>
+            <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-orange-500 text-slate-100">
+          </div>
+          <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold py-3 rounded-xl transition">
+            Iniciar Sesión
+          </button>
+        </form>
+
+        <form id="form-register" onsubmit="handleAuthSubmit(event, 'register')" class="space-y-4 hidden">
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Nombre Completo</label>
+            <input type="text" id="reg-name" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-orange-500 text-slate-100">
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Correo Electrónico</label>
+            <input type="email" id="reg-email" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-orange-500 text-slate-100">
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Contraseña (Mínimo 6 caracteres)</label>
+            <input type="password" id="reg-password" minlength="6" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-orange-500 text-slate-100">
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Confirmar Contraseña</label>
+            <input type="password" id="reg-confirm-password" minlength="6" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 focus:outline-none focus:border-orange-500 text-slate-100">
+          </div>
+          <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold py-3 rounded-xl transition">
+            Crear Cuenta
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DETALLE DE HISTORIA DEL EQUIPO -->
+  <div id="team-modal" class="fixed inset-0 bg-slate-950/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="relative w-full max-w-2xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl transition-all">
+      <div class="p-5 border-b border-slate-800 flex justify-between items-start bg-slate-800/80">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span id="modal-team-div" class="text-xs uppercase font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2.5 py-0.5 rounded-full"></span>
+            <span id="modal-team-founded" class="text-xs text-slate-400 font-medium"></span>
+          </div>
+          <h3 id="modal-team-name" class="text-2xl font-black text-slate-100 mt-1"></h3>
+          <p class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span id="modal-team-city"></span>
+          </p>
+        </div>
+        <button onclick="closeTeamModal()" class="p-1.5 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
+            <span class="text-xs text-slate-400 font-semibold block">Estadio / Sede</span>
+            <span id="modal-team-stadium" class="text-sm font-bold text-amber-300"></span>
+          </div>
+          <div class="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
+            <span class="text-xs text-slate-400 font-semibold block">Palmarés</span>
+            <span id="modal-team-titles" class="text-sm font-bold text-emerald-400"></span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i>
+            <span>Reseña Histórica</span>
+          </h4>
+          <p id="modal-team-history" class="text-sm text-slate-300 leading-relaxed bg-slate-950/40 p-4 rounded-xl border border-slate-800/80"></p>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-800/60 border-t border-slate-800 flex justify-end">
+        <button onclick="closeTeamModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-5 py-2 rounded-xl text-xs font-bold transition">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE REALIDAD AUMENTADA -->
+  <div id="ar-modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-center justify-center p-2 sm:p-4">
+    <div class="relative w-full max-w-7xl bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-[94vh] shadow-2xl">
+      <div class="p-3 sm:p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800 z-10">
+        <div class="flex items-center space-x-2.5">
+          <i data-lucide="qr-code" class="text-orange-400"></i>
+          <h3 class="font-bold text-sm sm:text-base text-slate-100">Visor de Realidad Aumentada</h3>
+          <span class="hidden sm:inline-block text-[11px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
+            Detección Automática (Bate, Model 1, Model 2 & Model 3)
+          </span>
+        </div>
+
+        <button onclick="closeARModal()" class="p-1 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <div id="ar-container" class="relative flex-1 w-full h-full bg-black overflow-hidden flex items-center justify-center"></div>
+
+      <div class="p-3 sm:p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap gap-2 justify-center z-10">
+        <button id="btn-ar-action" onclick="arCustomAction()" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-orange-500/20">
+          <i id="icon-ar-action" data-lucide="zap" class="w-4 h-4"></i>
+          <span id="text-ar-action">Animación</span>
+        </button>
+
+        <button id="btn-toggle-rotate" onclick="toggleARRotation()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
+          <i id="icon-toggle-rotate" data-lucide="pause" class="w-4 h-4"></i>
+          <span id="text-toggle-rotate">Pausar Rotación</span>
+        </button>
+
+        <button onclick="toggleParticles()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Alternar Partículas</span>
+        </button>
+
+        <button onclick="arConfettiAction()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
+          <i data-lucide="party-popper" class="w-4 h-4 text-emerald-400"></i>
+          <span>Confeti</span>
+        </button>
+
+        <button onclick="arTakePhotoAction()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
+          <i data-lucide="camera" class="w-4 h-4 text-rose-400"></i>
+          <span>Tomar Foto</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE VISTA PREVIA DE FOTO CAPTURADA -->
+  <div id="photo-preview-modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800">
+        <h3 class="font-bold flex items-center space-x-2 text-base text-slate-100">
+          <i data-lucide="image" class="text-rose-400"></i>
+          <span>Vista Previa de la Foto</span>
+        </h3>
+        <button onclick="closePhotoPreview()" class="p-1 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <div class="relative flex-1 bg-black p-3 flex items-center justify-center overflow-hidden">
+        <img id="photo-preview-img" src="" alt="Captura AR" class="max-h-[60vh] w-auto rounded-xl border border-slate-800 object-contain shadow-lg">
+      </div>
+
+      <div class="p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap gap-3 justify-end items-center">
+        <button onclick="closePhotoPreview()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center space-x-2">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Regresar a la Cámara</span>
+        </button>
+        <button onclick="downloadCapturedPhoto()" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center space-x-2 shadow-lg shadow-orange-500/20">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Guardar en Dispositivo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inicializador de Lucide Icons -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
