@@ -16,7 +16,8 @@ import {
   openTargetsModal,
   closeTargetsModal,
   viewDetectedTeamHistory,
-  toggleARFullscreen
+  toggleARFullscreen,
+  toggleARMirroring
 } from './modules/arViewer.js';
 import { initGameCanvas, startGame, stopGame, swingBat, gameState } from './modules/battingGame.js';
 import { loadLiveStandings, filterDivisionTable } from './modules/standings.js';
@@ -61,6 +62,7 @@ window.openTargetsModal = openTargetsModal;
 window.closeTargetsModal = closeTargetsModal;
 window.viewDetectedTeamHistory = viewDetectedTeamHistory;
 window.toggleARFullscreen = toggleARFullscreen;
+window.toggleARMirroring = toggleARMirroring;
 
 window.startGame = startGame;
 window.swingBat = swingBat;

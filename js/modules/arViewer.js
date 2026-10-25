@@ -1,5 +1,11 @@
 // Módulo de Realidad Aumentada (MindAR + A-Frame) - 15 Equipos Liga Nacional
-export const ASSET_VERSION = '20261025_05';
+export const ASSET_VERSION = '20261025_06';
+
+const STORAGE_KEY_AR_MIRROR = 'barseball_ar_mirrored';
+// Por defecto false (sin efecto espejo / vista natural, para lectura de textos y tarjetas)
+let isMirrored = typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_KEY_AR_MIRROR) !== null
+  ? localStorage.getItem(STORAGE_KEY_AR_MIRROR) === 'true'
+  : false;
 
 let isRotating = true;
 let isPerformingAction = false;
@@ -259,7 +265,7 @@ export async function openARModal() {
     </div>
 
     <a-scene
-      style="transform: scaleX(-1); -webkit-transform: scaleX(-1); width: 100%; height: 100%;"
+      style="transform: ${isMirrored ? 'scaleX(-1)' : 'none'}; -webkit-transform: ${isMirrored ? 'scaleX(-1)' : 'none'}; width: 100%; height: 100%;"
       embedded
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
@@ -278,11 +284,12 @@ export async function openARModal() {
   const checkVideoInterval = setInterval(() => {
     const mindarVideo = container.querySelector('video') || document.querySelector('video:not(#raw-video)');
     if (mindarVideo) {
-      mindarVideo.style.transform = 'scaleX(-1)';
-      mindarVideo.style.webkitTransform = 'scaleX(-1)';
+      applyMirroringTransforms();
       clearInterval(checkVideoInterval);
     }
   }, 100);
+
+  updateMirrorButtonUI();
 
   const confettiCanvas = document.getElementById('confetti-canvas');
   if (confettiCanvas && typeof confetti !== 'undefined') {
@@ -500,17 +507,22 @@ export function arTakePhotoAction() {
     sY = (vH - sH) / 2;
   }
 
-  ctx.save();
-  ctx.translate(targetW, 0);
-  ctx.scale(-1, 1);
-  ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
-  ctx.restore();
+  if (isMirrored) {
+    ctx.save();
+    ctx.translate(targetW, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
+    ctx.restore();
 
-  ctx.save();
-  ctx.translate(targetW, 0);
-  ctx.scale(-1, 1);
-  ctx.drawImage(aCanvas, 0, 0, targetW, targetH);
-  ctx.restore();
+    ctx.save();
+    ctx.translate(targetW, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(aCanvas, 0, 0, targetW, targetH);
+    ctx.restore();
+  } else {
+    ctx.drawImage(video, sX, sY, sW, sH, 0, 0, targetW, targetH);
+    ctx.drawImage(aCanvas, 0, 0, targetW, targetH);
+  }
 
   const confettiCanvas = document.getElementById('confetti-canvas');
   if (confettiCanvas && confettiCanvas.width > 0 && confettiCanvas.height > 0) {
@@ -660,6 +672,72 @@ export function toggleARFullscreen() {
       });
     }
     if (icon) icon.setAttribute('data-lucide', 'maximize');
+  }
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Alternar modo espejo (invertir horizontalmente o vista natural)
+export function toggleARMirroring() {
+  isMirrored = !isMirrored;
+  try {
+    localStorage.setItem(STORAGE_KEY_AR_MIRROR, isMirrored ? 'true' : 'false');
+  } catch (e) {}
+  applyMirroringTransforms();
+}
+
+// Aplicar transformaciones CSS de espejeado en vivo
+export function applyMirroringTransforms() {
+  const container = document.getElementById('ar-container');
+  const transformVal = isMirrored ? 'scaleX(-1)' : 'none';
+
+  if (container) {
+    const scene = container.querySelector('a-scene');
+    if (scene) {
+      scene.style.transform = transformVal;
+      scene.style.webkitTransform = transformVal;
+    }
+  }
+
+  const videos = document.querySelectorAll('video:not(#raw-video)');
+  videos.forEach(v => {
+    v.style.transform = transformVal;
+    v.style.webkitTransform = transformVal;
+  });
+
+  updateMirrorButtonUI();
+}
+
+// Actualizar textos, colores e iconos del botón de espejo
+export function updateMirrorButtonUI() {
+  const text = document.getElementById('text-toggle-mirror');
+  const icon = document.getElementById('icon-toggle-mirror');
+  const btn = document.getElementById('btn-toggle-mirror');
+
+  if (text) {
+    text.textContent = isMirrored ? 'Espejo: Sí' : 'Espejo: No';
+  }
+  if (btn) {
+    if (isMirrored) {
+      btn.classList.add('border-cyan-500/60', 'text-cyan-300');
+      btn.classList.remove('border-white/20', 'text-slate-300');
+      btn.setAttribute('title', 'Modo espejo activado (haz clic para no espejear / vista normal)');
+    } else {
+      btn.classList.remove('border-cyan-500/60', 'text-cyan-300');
+      btn.classList.add('border-white/20', 'text-slate-300');
+      btn.setAttribute('title', 'Modo espejo desactivado (haz clic para activar espejo)');
+    }
+  }
+  if (icon) {
+    icon.setAttribute('data-lucide', 'flip-horizontal');
+    if (isMirrored) {
+      icon.classList.add('text-cyan-400');
+      icon.classList.remove('text-slate-400');
+    } else {
+      icon.classList.remove('text-cyan-400');
+      icon.classList.add('text-slate-400');
+    }
   }
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();

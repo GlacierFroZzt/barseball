@@ -608,6 +608,10 @@
           <span class="hidden sm:inline">15 Tarjetas (1280x720)</span>
           <span class="sm:hidden">Tarjetas</span>
         </button>
+        <button id="btn-toggle-mirror" onclick="toggleARMirroring()" class="px-3 py-2 bg-slate-900/85 hover:bg-slate-800 border border-white/20 rounded-xl text-slate-300 hover:text-white text-xs font-bold transition flex items-center space-x-1.5 backdrop-blur-md shadow-xl" title="Alternar modo espejo (despejar o espejear cámara)">
+          <i id="icon-toggle-mirror" data-lucide="flip-horizontal" class="w-4 h-4 text-slate-400"></i>
+          <span id="text-toggle-mirror" class="hidden sm:inline">Espejo: No</span>
+        </button>
         <button onclick="toggleARFullscreen()" class="p-2 sm:p-2.5 bg-slate-900/85 hover:bg-slate-800 border border-white/20 rounded-xl text-slate-300 hover:text-white transition backdrop-blur-md shadow-xl" title="Pantalla Completa">
           <i id="icon-ar-fullscreen" data-lucide="maximize" class="w-4 h-4"></i>
         </button>
@@ -754,6 +758,6 @@
       }
     });
   </script>
-  <script type="module" src="./js/main.js?v=20261025_05"></script>
+  <script type="module" src="./js/main.js?v=20261025_06"></script>
 </body>
 </html>
