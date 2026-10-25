@@ -12,12 +12,9 @@ if (typeof AFRAME !== 'undefined' && !AFRAME.components['force-center-mesh']) {
       this.el.addEventListener('model-loaded', () => {
         const obj = this.el.getObject3D('mesh');
         if (!obj) return;
-        obj.traverse((child) => {
-          if (child.isMesh && child.geometry) {
-            child.geometry.computeBoundingBox();
-            child.geometry.center();
-          }
-        });
+        const box = new THREE.Box3().setFromObject(obj);
+        const center = box.getCenter(new THREE.Vector3());
+        obj.position.sub(center);
       });
     }
   });
@@ -103,23 +100,23 @@ function generateStarsAuraHTML(count = 35) {
   return html;
 }
 
-// Configuración de los 15 objetivos MindAR (índices 0 al 14 en targets_combined.mind)
+// Configuración de los 15 objetivos MindAR (índices 0 al 14 en targets_combined.mind basados en LogosBaseball.mind)
 export const AR_TARGETS = [
-  { index: 0, slug: 'braves', name: 'Atlanta Braves', type: 'jersey', modelSrc: './teams/braves/model.glb', scale: '0.55 0.55 0.55', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 1, slug: 'marlins', name: 'Miami Marlins', type: 'bat', modelSrc: './teams/marlins/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
-  { index: 2, slug: 'mets', name: 'New York Mets', type: 'bat', modelSrc: './teams/mets/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
-  { index: 3, slug: 'phillies', name: 'Philadelphia Phillies', type: 'bat', modelSrc: './teams/phillies/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
-  { index: 4, slug: 'nationals', name: 'Washington Nationals', type: 'jersey', modelSrc: './teams/nationals/model.glb', scale: '0.55 0.55 0.55', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 5, slug: 'cubs', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 6, slug: 'reds', name: 'Cincinnati Reds', type: 'helmet', modelSrc: './teams/reds/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 7, slug: 'brewers', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.55 0.55 0.55', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 8, slug: 'pirates', name: 'Pittsburgh Pirates', type: 'helmet', modelSrc: './teams/pirates/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 9, slug: 'cardinals', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 10, slug: 'diamondbacks', name: 'Arizona Diamondbacks', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 11, slug: 'rockies', name: 'Colorado Rockies', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 12, slug: 'dodgers', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.45 0.45 0.45', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 13, slug: 'padres', name: 'San Diego Padres', type: 'ball', modelSrc: './teams/padres/model.glb', scale: '0.45 0.45 0.45', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 14, slug: 'giants', name: 'San Francisco Giants', type: 'ball', modelSrc: './teams/giants/model.glb', scale: '0.45 0.45 0.45', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
+  { index: 0, slug: 'braves', name: 'Atlanta Braves', type: 'jersey', modelSrc: './teams/braves/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 1, slug: 'brewers', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 2, slug: 'cardinals', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 3, slug: 'cubs', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 4, slug: 'diamondbacks', name: 'Arizona Diamondbacks', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 5, slug: 'dodgers', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 6, slug: 'giants', name: 'San Francisco Giants', type: 'ball', modelSrc: './teams/giants/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 7, slug: 'marlins', name: 'Miami Marlins', type: 'bat', modelSrc: './teams/marlins/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 8, slug: 'mets', name: 'New York Mets', type: 'bat', modelSrc: './teams/mets/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 9, slug: 'nationals', name: 'Washington Nationals', type: 'jersey', modelSrc: './teams/nationals/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 10, slug: 'padres', name: 'San Diego Padres', type: 'ball', modelSrc: './teams/padres/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 11, slug: 'phillies', name: 'Philadelphia Phillies', type: 'bat', modelSrc: './teams/phillies/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 12, slug: 'pirates', name: 'Pittsburgh Pirates', type: 'helmet', modelSrc: './teams/pirates/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 13, slug: 'reds', name: 'Cincinnati Reds', type: 'helmet', modelSrc: './teams/reds/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 14, slug: 'rockies', name: 'Colorado Rockies', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
 ];
 
 export async function openARModal() {
