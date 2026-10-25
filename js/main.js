@@ -12,7 +12,9 @@ import {
   arConfettiAction, 
   arTakePhotoAction, 
   closePhotoPreview, 
-  downloadCapturedPhoto 
+  downloadCapturedPhoto,
+  openTargetsModal,
+  closeTargetsModal
 } from './modules/arViewer.js';
 import { initGameCanvas, startGame, stopGame, swingBat, gameState } from './modules/battingGame.js';
 import { loadLiveStandings, filterDivisionTable } from './modules/standings.js';
@@ -53,6 +55,8 @@ window.arConfettiAction = arConfettiAction;
 window.arTakePhotoAction = arTakePhotoAction;
 window.closePhotoPreview = closePhotoPreview;
 window.downloadCapturedPhoto = downloadCapturedPhoto;
+window.openTargetsModal = openTargetsModal;
+window.closeTargetsModal = closeTargetsModal;
 
 window.startGame = startGame;
 window.swingBat = swingBat;
@@ -64,6 +68,7 @@ window.initNewTriviaGame = initNewTriviaGame;
 window.openTeamModal = openTeamModal;
 window.closeTeamModal = closeTeamModal;
 window.changeUserRepresentingTeam = changeUserRepresentingTeam;
+window.getUserRepresentingTeam = getUserRepresentingTeam;
 window.recordRunsForRepresentedTeam = recordRunsForRepresentedTeam;
 
 // -------------------------------------------------------------

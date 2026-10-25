@@ -1,4 +1,4 @@
-// Módulo de Realidad Aumentada (MindAR + A-Frame)
+// Módulo de Realidad Aumentada (MindAR + A-Frame) - 15 Equipos Liga Nacional
 let isRotating = true;
 let isPerformingAction = false;
 let particlesVisible = true;
@@ -73,7 +73,7 @@ if (typeof AFRAME !== 'undefined' && !AFRAME.components['star-particle']) {
   });
 }
 
-function generateStarsAuraHTML(count = 45) {
+function generateStarsAuraHTML(count = 35) {
   let html = '';
   const yellowTones = ['#facc15', '#fbbf24', '#fde047', '#f59e0b', '#fef08a'];
 
@@ -102,6 +102,25 @@ function generateStarsAuraHTML(count = 45) {
   }
   return html;
 }
+
+// Configuración de los 15 objetivos MindAR (índices 0 al 14 en targets_combined.mind)
+export const AR_TARGETS = [
+  { index: 0, slug: 'braves', name: 'Atlanta Braves', type: 'jersey', modelSrc: './teams/braves/model.glb', scale: '0.55 0.55 0.55', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 1, slug: 'marlins', name: 'Miami Marlins', type: 'bat', modelSrc: './teams/marlins/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 2, slug: 'mets', name: 'New York Mets', type: 'bat', modelSrc: './teams/mets/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 3, slug: 'phillies', name: 'Philadelphia Phillies', type: 'bat', modelSrc: './teams/phillies/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 4, slug: 'nationals', name: 'Washington Nationals', type: 'jersey', modelSrc: './teams/nationals/model.glb', scale: '0.55 0.55 0.55', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 5, slug: 'cubs', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 6, slug: 'reds', name: 'Cincinnati Reds', type: 'helmet', modelSrc: './teams/reds/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 7, slug: 'brewers', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.55 0.55 0.55', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 8, slug: 'pirates', name: 'Pittsburgh Pirates', type: 'helmet', modelSrc: './teams/pirates/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 9, slug: 'cardinals', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 10, slug: 'diamondbacks', name: 'Arizona Diamondbacks', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 11, slug: 'rockies', name: 'Colorado Rockies', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 12, slug: 'dodgers', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.45 0.45 0.45', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 13, slug: 'padres', name: 'San Diego Padres', type: 'ball', modelSrc: './teams/padres/model.glb', scale: '0.45 0.45 0.45', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 14, slug: 'giants', name: 'San Francisco Giants', type: 'ball', modelSrc: './teams/giants/model.glb', scale: '0.45 0.45 0.45', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
+];
 
 export async function openARModal() {
   const modal = document.getElementById('ar-modal');
@@ -136,7 +155,55 @@ export async function openARModal() {
   particlesVisible = true;
   updateRotateButtonUI(true);
 
-  // Escena con detector automático de ambos objetivos (targetIndex 0 = Bate, targetIndex 1 = Model 1)
+  // Generar etiquetas de assets para modelos 3D activos
+  const assetItemsHTML = AR_TARGETS.filter(t => t.modelSrc).map(t => {
+    return `<a-asset-item id="asset-${t.slug}" src="${t.modelSrc}"></a-asset-item>`;
+  }).join('\n');
+
+  // Generar entidades para los 15 objetivos
+  const entitiesHTML = AR_TARGETS.map(t => {
+    const isZRot = t.rotType === 'z';
+    const rotTo = isZRot ? '0 0 360' : '0 360 0';
+    const rotDur = isZRot ? 3000 : 3600;
+
+    let contentHTML = '';
+    if (t.modelSrc) {
+      contentHTML = `
+        <a-gltf-model 
+          id="model-${t.slug}" 
+          src="#asset-${t.slug}" 
+          position="0 0 0" 
+          scale="${t.scale}"
+          force-center-mesh>
+        </a-gltf-model>
+      `;
+    } else {
+      // Indicador holográfico para los 3 equipos pendientes
+      contentHTML = `
+        <a-entity position="0 0 0">
+          <a-ring radius-inner="0.22" radius-outer="0.25" material="color: #38bdf8; side: double; emissive: #0284c7; emissiveIntensity: 0.8" rotation="0 0 0"></a-ring>
+          <a-ring radius-inner="0.14" radius-outer="0.16" material="color: #facc15; side: double; emissive: #eab308; emissiveIntensity: 0.8" rotation="0 0 45"></a-ring>
+          <a-text value="${t.name}\n[ 3D PROXIMAMENTE ]" align="center" position="0 0 0.05" scale="0.32 0.32 0.32" color="#ffffff"></a-text>
+        </a-entity>
+      `;
+    }
+
+    return `
+      <!-- OBJETIVO ${t.index}: ${t.name} -->
+      <a-entity id="ar-target-${t.slug}" mindar-image-target="targetIndex: ${t.index}">
+        <a-entity id="anchor-${t.slug}" class="ar-anchor" data-rot-type="${t.rotType}" position="${t.pos}" rotation="${t.rot}">
+          <a-entity id="rotator-${t.slug}" class="ar-rotator" data-rot-to="${rotTo}" data-rot-dur="${rotDur}" animation="property: rotation; to: ${rotTo}; dur: ${rotDur}; easing: linear; loop: true">
+            ${contentHTML}
+          </a-entity>
+        </a-entity>
+
+        <a-entity id="particles-${t.slug}" class="particles-cloud" animation="property: rotation; to: 0 0 360; dur: 50000; easing: linear; loop: true">
+          ${generateStarsAuraHTML(32)}
+        </a-entity>
+      </a-entity>
+    `;
+  }).join('\n');
+
   container.innerHTML = `
     <a-scene
       style="transform: scaleX(-1); -webkit-transform: scaleX(-1); width: 100%; height: 100%;"
@@ -148,89 +215,12 @@ export async function openARModal() {
       renderer="preserveDrawingBuffer: true;">
       
       <a-assets>
-        <a-asset-item id="bateModel" src="./bate/bate.glb"></a-asset-item>
-        <a-asset-item id="model1Asset" src="./Model1/P1.0.glb"></a-asset-item>
-        <a-asset-item id="model2Asset" src="./Model2/P2.glb"></a-asset-item>
-        <a-asset-item id="model3Asset" src="./Model3/P3.glb"></a-asset-item>
+        ${assetItemsHTML}
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- OBJETIVO 0: BATE DE BÉISBOL -->
-      <a-entity id="ar-target-bate" mindar-image-target="targetIndex: 0">
-        <a-entity id="bate-anchor" position="0 0 0.05" rotation="0 0 45">
-          <a-entity id="bate-rotator" class="ar-rotator" animation="property: rotation; to: 0 0 360; dur: 3000; easing: linear; loop: true">
-            <a-gltf-model 
-              id="bate-3d-model" 
-              src="#bateModel" 
-              position="0 0 0" 
-              scale="0.14 0.14 0.14"
-              force-center-mesh>
-            </a-gltf-model>
-          </a-entity>
-        </a-entity>
-
-        <a-entity id="particles-bate" class="particles-cloud" animation="property: rotation; to: 0 0 360; dur: 50000; easing: linear; loop: true">
-          ${generateStarsAuraHTML(35)}
-        </a-entity>
-      </a-entity>
-
-      <!-- OBJETIVO 1: MODEL 1 (HUMANO) -->
-      <a-entity id="ar-target-model1" mindar-image-target="targetIndex: 1">
-        <a-entity id="model1-anchor" position="0 0 0.05" rotation="0 0 0">
-          <a-entity id="model1-rotator" class="ar-rotator" animation="property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true">
-            <a-gltf-model 
-              id="model1-3d-model" 
-              src="#model1Asset" 
-              position="0 0 0" 
-              scale="0.35 0.35 0.35"
-              force-center-mesh>
-            </a-gltf-model>
-          </a-entity>
-        </a-entity>
-
-        <a-entity id="particles-model1" class="particles-cloud" animation="property: rotation; to: 0 0 360; dur: 50000; easing: linear; loop: true">
-          ${generateStarsAuraHTML(35)}
-        </a-entity>
-      </a-entity>
-
-      <!-- OBJETIVO 2: MODEL 2 (HUMANO) -->
-      <a-entity id="ar-target-model2" mindar-image-target="targetIndex: 2">
-        <a-entity id="model2-anchor" position="0 0 0.05" rotation="0 0 0">
-          <a-entity id="model2-rotator" class="ar-rotator" animation="property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true">
-            <a-gltf-model 
-              id="model2-3d-model" 
-              src="#model2Asset" 
-              position="0 0 0" 
-              scale="0.35 0.35 0.35"
-              force-center-mesh>
-            </a-gltf-model>
-          </a-entity>
-        </a-entity>
-
-        <a-entity id="particles-model2" class="particles-cloud" animation="property: rotation; to: 0 0 360; dur: 50000; easing: linear; loop: true">
-          ${generateStarsAuraHTML(35)}
-        </a-entity>
-      </a-entity>
-
-      <!-- OBJETIVO 3: MODEL 3 (HUMANO) -->
-      <a-entity id="ar-target-model3" mindar-image-target="targetIndex: 3">
-        <a-entity id="model3-anchor" position="0 0 0.05" rotation="0 0 0">
-          <a-entity id="model3-rotator" class="ar-rotator" animation="property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true">
-            <a-gltf-model 
-              id="model3-3d-model" 
-              src="#model3Asset" 
-              position="0 0 0" 
-              scale="0.35 0.35 0.35"
-              force-center-mesh>
-            </a-gltf-model>
-          </a-entity>
-        </a-entity>
-
-        <a-entity id="particles-model3" class="particles-cloud" animation="property: rotation; to: 0 0 360; dur: 50000; easing: linear; loop: true">
-          ${generateStarsAuraHTML(35)}
-        </a-entity>
-      </a-entity>
+      ${entitiesHTML}
     </a-scene>
 
     <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none w-full h-full z-20"></canvas>
@@ -298,23 +288,11 @@ export function toggleARRotation() {
     isRotating = false;
     updateRotateButtonUI(false);
   } else {
-    const bateRotator = document.getElementById('bate-rotator');
-    if (bateRotator) {
-      bateRotator.setAttribute('animation', 'property: rotation; to: 0 0 360; dur: 3000; easing: linear; loop: true');
-    }
-    const model1Rotator = document.getElementById('model1-rotator');
-    if (model1Rotator) {
-      model1Rotator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true');
-    }
-    const model2Rotator = document.getElementById('model2-rotator');
-    if (model2Rotator) {
-      model2Rotator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true');
-    }
-    const model3Rotator = document.getElementById('model3-rotator');
-    if (model3Rotator) {
-      model3Rotator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true');
-    }
-
+    rotators.forEach(r => {
+      const rotTo = r.getAttribute('data-rot-to') || '0 360 0';
+      const rotDur = r.getAttribute('data-rot-dur') || '3500';
+      r.setAttribute('animation', `property: rotation; to: ${rotTo}; dur: ${rotDur}; easing: linear; loop: true`);
+    });
     isRotating = true;
     updateRotateButtonUI(true);
   }
@@ -347,131 +325,59 @@ export function toggleParticles() {
 
 export function arCustomAction() {
   if (isPerformingAction) return;
-
-  const bateRotator = document.getElementById('bate-rotator');
-  const bateAnchor = document.getElementById('bate-anchor');
-  const model1Rotator = document.getElementById('model1-rotator');
-  const model1Anchor = document.getElementById('model1-anchor');
-  const model2Rotator = document.getElementById('model2-rotator');
-  const model2Anchor = document.getElementById('model2-anchor');
-  const model3Rotator = document.getElementById('model3-rotator');
-  const model3Anchor = document.getElementById('model3-anchor');
-
   isPerformingAction = true;
 
-  // Animación para Bate (Swing)
-  if (bateRotator && bateAnchor) {
-    bateRotator.removeAttribute('animation');
-    bateRotator.setAttribute('rotation', '0 0 0');
-    bateAnchor.setAttribute('animation', {
-      property: 'rotation',
-      to: '0 0 405',
-      dur: 1000,
-      easing: 'easeInOutQuad'
-    });
-  }
+  const anchors = document.querySelectorAll('.ar-anchor');
+  const rotators = document.querySelectorAll('.ar-rotator');
 
-  // Animación para Model 1 (Salto y giro 3D)
-  if (model1Rotator && model1Anchor) {
-    model1Rotator.removeAttribute('animation');
-    model1Anchor.setAttribute('animation__jump', {
-      property: 'position',
-      to: '0 0.28 0.05',
-      dur: 400,
-      dir: 'alternate',
-      loop: 2,
-      easing: 'easeOutQuad'
-    });
+  rotators.forEach(r => r.removeAttribute('animation'));
 
-    model1Anchor.setAttribute('animation__spin', {
-      property: 'rotation',
-      to: '0 360 0',
-      dur: 800,
-      easing: 'easeInOutCubic'
-    });
-  }
-
-  // Animación para Model 2 (Salto y giro 3D)
-  if (model2Rotator && model2Anchor) {
-    model2Rotator.removeAttribute('animation');
-    model2Anchor.setAttribute('animation__jump', {
-      property: 'position',
-      to: '0 0.28 0.05',
-      dur: 400,
-      dir: 'alternate',
-      loop: 2,
-      easing: 'easeOutQuad'
-    });
-
-    model2Anchor.setAttribute('animation__spin', {
-      property: 'rotation',
-      to: '0 360 0',
-      dur: 800,
-      easing: 'easeInOutCubic'
-    });
-  }
-
-  // Animación para Model 3 (Salto y giro 3D)
-  if (model3Rotator && model3Anchor) {
-    model3Rotator.removeAttribute('animation');
-    model3Anchor.setAttribute('animation__jump', {
-      property: 'position',
-      to: '0 0.28 0.05',
-      dur: 400,
-      dir: 'alternate',
-      loop: 2,
-      easing: 'easeOutQuad'
-    });
-
-    model3Anchor.setAttribute('animation__spin', {
-      property: 'rotation',
-      to: '0 360 0',
-      dur: 800,
-      easing: 'easeInOutCubic'
-    });
-  }
+  anchors.forEach(a => {
+    const rotType = a.getAttribute('data-rot-type');
+    if (rotType === 'z') {
+      a.setAttribute('animation__swing', {
+        property: 'rotation',
+        to: '0 0 405',
+        dur: 900,
+        easing: 'easeInOutQuad'
+      });
+    } else {
+      a.setAttribute('animation__jump', {
+        property: 'position',
+        to: '0 0.28 0.05',
+        dur: 400,
+        dir: 'alternate',
+        loop: 2,
+        easing: 'easeOutQuad'
+      });
+      a.setAttribute('animation__spin', {
+        property: 'rotation',
+        to: '0 360 0',
+        dur: 800,
+        easing: 'easeInOutCubic'
+      });
+    }
+  });
 
   setTimeout(() => {
-    if (bateAnchor && bateRotator) {
-      bateAnchor.removeAttribute('animation');
-      bateAnchor.setAttribute('rotation', '0 0 45');
-      if (isRotating) {
-        bateRotator.setAttribute('animation', 'property: rotation; to: 0 0 360; dur: 3000; easing: linear; loop: true');
-      }
-    }
+    anchors.forEach(a => {
+      a.removeAttribute('animation__swing');
+      a.removeAttribute('animation__jump');
+      a.removeAttribute('animation__spin');
+      const rotType = a.getAttribute('data-rot-type');
+      a.setAttribute('position', '0 0 0.05');
+      a.setAttribute('rotation', rotType === 'z' ? '0 0 45' : '0 0 0');
+    });
 
-    if (model1Anchor && model1Rotator) {
-      model1Anchor.removeAttribute('animation__jump');
-      model1Anchor.removeAttribute('animation__spin');
-      model1Anchor.setAttribute('position', '0 0 0.05');
-      model1Anchor.setAttribute('rotation', '0 0 0');
-      if (isRotating) {
-        model1Rotator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true');
-      }
+    if (isRotating) {
+      rotators.forEach(r => {
+        const rotTo = r.getAttribute('data-rot-to') || '0 360 0';
+        const rotDur = r.getAttribute('data-rot-dur') || '3500';
+        r.setAttribute('animation', `property: rotation; to: ${rotTo}; dur: ${rotDur}; easing: linear; loop: true`);
+      });
     }
-
-    if (model2Anchor && model2Rotator) {
-      model2Anchor.removeAttribute('animation__jump');
-      model2Anchor.removeAttribute('animation__spin');
-      model2Anchor.setAttribute('position', '0 0 0.05');
-      model2Anchor.setAttribute('rotation', '0 0 0');
-      if (isRotating) {
-        model2Rotator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true');
-      }
-    }
-
-    if (model3Anchor && model3Rotator) {
-      model3Anchor.removeAttribute('animation__jump');
-      model3Anchor.removeAttribute('animation__spin');
-      model3Anchor.setAttribute('position', '0 0 0.05');
-      model3Anchor.setAttribute('rotation', '0 0 0');
-      if (isRotating) {
-        model3Rotator.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 3500; easing: linear; loop: true');
-      }
-    }
-
     isPerformingAction = false;
-  }, 1050);
+  }, 1000);
 }
 
 export const arJumpAction = arCustomAction;
@@ -569,13 +475,17 @@ export function arTakePhotoAction() {
   previewImg.src = currentPhotoDataUrl;
   previewModal.classList.remove('hidden');
   previewModal.classList.add('flex');
-  lucide.createIcons();
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 }
 
 export function closePhotoPreview() {
   const previewModal = document.getElementById('photo-preview-modal');
-  previewModal.classList.add('hidden');
-  previewModal.classList.remove('flex');
+  if (previewModal) {
+    previewModal.classList.add('hidden');
+    previewModal.classList.remove('flex');
+  }
 }
 
 export function downloadCapturedPhoto() {
@@ -588,3 +498,99 @@ export function downloadCapturedPhoto() {
   link.click();
   document.body.removeChild(link);
 }
+
+// Modal para Visualizar y Descargar las 15 Tarjetas (1280x720)
+export function openTargetsModal() {
+  const modal = document.getElementById('targets-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    renderTargetsGallery();
+  }
+}
+
+export function closeTargetsModal() {
+  const modal = document.getElementById('targets-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+export function renderTargetsGallery() {
+  const grid = document.getElementById('targets-gallery-grid');
+  if (!grid) return;
+
+  grid.innerHTML = AR_TARGETS.map(t => {
+    const is3DActive = !!t.modelSrc;
+    let badgeText = '';
+    let badgeColor = '';
+
+    if (t.type === 'jersey') {
+      badgeText = 'Jersey 3D';
+      badgeColor = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+    } else if (t.type === 'bat') {
+      badgeText = 'Bate 3D';
+      badgeColor = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+    } else if (t.type === 'helmet') {
+      badgeText = 'Casco 3D';
+      badgeColor = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+    } else if (t.type === 'ball') {
+      badgeText = 'Pelota 3D';
+      badgeColor = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+    } else {
+      badgeText = '3D Próximamente';
+      badgeColor = 'bg-slate-700/50 text-slate-400 border-slate-600';
+    }
+
+    return `
+      <div class="bg-slate-900 border border-slate-800 hover:border-orange-500/50 rounded-2xl overflow-hidden p-3 transition flex flex-col group">
+        <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-950 mb-2.5 cursor-pointer" onclick="window.viewTargetCardFullscreen('./targets_1280x720/${t.slug}_1280x720.png', '${t.name}')">
+          <img src="./targets_1280x720/${t.slug}_1280x720.png" alt="${t.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+            <span class="bg-slate-950/90 text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-white/20 flex items-center gap-1.5">
+              <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+              <span>Ver Completa</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 mt-auto">
+          <div>
+            <div class="text-xs font-black text-slate-100 truncate">${t.name}</div>
+            <span class="text-[10px] uppercase font-bold border px-1.5 py-0.5 rounded-md inline-block mt-1 ${badgeColor}">
+              ${badgeText}
+            </span>
+          </div>
+          <a href="./targets_1280x720/${t.slug}_1280x720.png" download="${t.slug}_target_1280x720.png" class="p-2 bg-slate-800 hover:bg-orange-500 hover:text-slate-950 text-slate-300 rounded-xl transition" title="Descargar 1280x720 PNG">
+            <i data-lucide="download" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+window.viewTargetCardFullscreen = function(imgSrc, title) {
+  const viewer = document.getElementById('single-card-viewer');
+  const img = document.getElementById('single-card-img');
+  const nameEl = document.getElementById('single-card-title');
+  if (viewer && img) {
+    img.src = imgSrc;
+    if (nameEl) nameEl.innerText = title;
+    viewer.classList.remove('hidden');
+    viewer.classList.add('flex');
+  }
+};
+
+window.closeSingleCardViewer = function() {
+  const viewer = document.getElementById('single-card-viewer');
+  if (viewer) {
+    viewer.classList.add('hidden');
+    viewer.classList.remove('flex');
+  }
+};
