@@ -14,7 +14,9 @@ import {
   closePhotoPreview, 
   downloadCapturedPhoto,
   openTargetsModal,
-  closeTargetsModal
+  closeTargetsModal,
+  viewDetectedTeamHistory,
+  toggleARFullscreen
 } from './modules/arViewer.js';
 import { initGameCanvas, startGame, stopGame, swingBat, gameState } from './modules/battingGame.js';
 import { loadLiveStandings, filterDivisionTable } from './modules/standings.js';
@@ -57,6 +59,8 @@ window.closePhotoPreview = closePhotoPreview;
 window.downloadCapturedPhoto = downloadCapturedPhoto;
 window.openTargetsModal = openTargetsModal;
 window.closeTargetsModal = closeTargetsModal;
+window.viewDetectedTeamHistory = viewDetectedTeamHistory;
+window.toggleARFullscreen = toggleARFullscreen;
 
 window.startGame = startGame;
 window.swingBat = swingBat;

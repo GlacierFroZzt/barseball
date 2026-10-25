@@ -532,7 +532,7 @@
   </main>
 
   <!-- MODAL DETALLE DE HISTORIA DEL EQUIPO -->
-  <div id="team-modal" class="fixed inset-0 bg-slate-950/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+  <div id="team-modal" class="fixed inset-0 bg-slate-950/90 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-md">
     <div class="relative w-full max-w-2xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl transition-all">
       <div class="p-5 border-b border-slate-800 flex justify-between items-start bg-slate-800/80">
         <div>
@@ -580,63 +580,81 @@
     </div>
   </div>
 
-  <!-- MODAL DE REALIDAD AUMENTADA -->
-  <div id="ar-modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-center justify-center p-2 sm:p-4">
-    <div class="relative w-full max-w-7xl bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col h-[94vh] shadow-2xl">
-      <div class="p-3 sm:p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800 z-10">
-        <div class="flex items-center space-x-2.5">
-          <i data-lucide="qr-code" class="text-orange-400"></i>
-          <h3 class="font-bold text-sm sm:text-base text-slate-100">Visor de Realidad Aumentada</h3>
-          <span class="hidden sm:inline-block text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-            Detección Automática &bull; 15 Equipos de la Liga Nacional (12 Modelos 3D)
-          </span>
-        </div>
+  <!-- MODAL DE REALIDAD AUMENTADA (PANTALLA COMPLETA Y EXPANDIDA) -->
+  <div id="ar-modal" class="fixed inset-0 w-screen h-screen bg-black z-50 hidden flex-col overflow-hidden">
+    <!-- CONTENEDOR 3D / CÁMARA (OCUPA EL 100% DE LA PANTALLA) -->
+    <div id="ar-container" class="w-full h-full absolute inset-0 bg-black overflow-hidden flex items-center justify-center"></div>
 
-        <div class="flex items-center space-x-2">
-          <button onclick="openTargetsModal()" class="px-2.5 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 rounded-xl text-amber-300 text-xs font-bold transition flex items-center space-x-1.5 shadow-sm">
-            <i data-lucide="layers" class="w-4 h-4 text-amber-400"></i>
-            <span class="hidden sm:inline">Ver 15 Tarjetas (1280x720)</span>
-            <span class="sm:hidden">Tarjetas</span>
-          </button>
-          <button onclick="closeARModal()" class="p-1 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition">
-            <i data-lucide="x" class="w-6 h-6"></i>
-          </button>
+    <!-- CABECERA FLOTANTE TRANSPARENTE -->
+    <div class="absolute top-0 inset-x-0 p-3 sm:p-5 bg-gradient-to-b from-slate-950/90 via-slate-950/50 to-transparent flex justify-between items-center z-20 pointer-events-auto">
+      <div class="flex items-center space-x-2.5">
+        <div class="p-2 sm:p-2.5 bg-orange-500/20 border border-orange-500/30 rounded-2xl text-orange-400 shadow-lg shadow-orange-500/10">
+          <i data-lucide="qr-code" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-sm sm:text-base text-slate-100 flex items-center gap-2 drop-shadow-md">
+            <span>Visor AR de Grandes Ligas</span>
+          </h3>
+          <span class="text-[10px] sm:text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5 drop-shadow">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>15 Equipos de la Liga Nacional (12 Modelos 3D)</span>
+          </span>
         </div>
       </div>
 
-      <div id="ar-container" class="relative flex-1 w-full h-full bg-black overflow-hidden flex items-center justify-center"></div>
-
-      <div class="p-3 sm:p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap gap-2 justify-center z-10">
-        <button id="btn-ar-action" onclick="arCustomAction()" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-orange-500/20">
-          <i id="icon-ar-action" data-lucide="zap" class="w-4 h-4"></i>
-          <span id="text-ar-action">Animación</span>
+      <div class="flex items-center space-x-2">
+        <button onclick="openTargetsModal()" class="px-3 py-2 bg-slate-900/85 hover:bg-slate-800 border border-white/20 rounded-xl text-amber-300 text-xs font-bold transition flex items-center space-x-1.5 backdrop-blur-md shadow-xl" title="Ver 15 Tarjetas">
+          <i data-lucide="layers" class="w-4 h-4 text-amber-400"></i>
+          <span class="hidden sm:inline">15 Tarjetas (1280x720)</span>
+          <span class="sm:hidden">Tarjetas</span>
         </button>
-
-        <button id="btn-toggle-rotate" onclick="toggleARRotation()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
-          <i id="icon-toggle-rotate" data-lucide="pause" class="w-4 h-4"></i>
-          <span id="text-toggle-rotate">Pausar Rotación</span>
+        <button onclick="toggleARFullscreen()" class="p-2 sm:p-2.5 bg-slate-900/85 hover:bg-slate-800 border border-white/20 rounded-xl text-slate-300 hover:text-white transition backdrop-blur-md shadow-xl" title="Pantalla Completa">
+          <i id="icon-ar-fullscreen" data-lucide="maximize" class="w-4 h-4"></i>
         </button>
-
-        <button onclick="toggleParticles()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>Alternar Partículas</span>
-        </button>
-
-        <button onclick="arConfettiAction()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
-          <i data-lucide="party-popper" class="w-4 h-4 text-emerald-400"></i>
-          <span>Confeti</span>
-        </button>
-
-        <button onclick="arTakePhotoAction()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-xs sm:text-sm transition flex items-center space-x-1.5">
-          <i data-lucide="camera" class="w-4 h-4 text-rose-400"></i>
-          <span>Tomar Foto</span>
+        <button onclick="closeARModal()" class="p-2 sm:p-2.5 bg-slate-900/85 hover:bg-rose-600/80 border border-white/20 rounded-xl text-slate-300 hover:text-white transition backdrop-blur-md shadow-xl" title="Cerrar Visor AR">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
+
+    <!-- BOTONES DE CONTROL FLOTANTES EN LA PARTE INFERIOR -->
+    <div class="absolute bottom-0 inset-x-0 p-3 sm:p-6 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent flex flex-wrap gap-2.5 justify-center items-center z-20 pointer-events-auto">
+      <!-- BOTÓN VER HISTORIA DEL EQUIPO DETECTADO -->
+      <button id="btn-team-history" onclick="viewDetectedTeamHistory()" class="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 hover:from-orange-600 hover:to-amber-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center space-x-2 shadow-xl shadow-orange-500/30 transform hover:scale-105 active:scale-95 cursor-pointer">
+        <i data-lucide="book-open" class="w-4 h-4"></i>
+        <span id="text-team-history">Ver Historia</span>
+      </button>
+
+      <button id="btn-ar-action" onclick="arCustomAction()" class="bg-slate-900/85 hover:bg-slate-800 text-slate-200 border border-white/15 font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 backdrop-blur-md shadow-lg active:scale-95">
+        <i id="icon-ar-action" data-lucide="zap" class="w-4 h-4 text-orange-400"></i>
+        <span id="text-ar-action">Animación</span>
+      </button>
+
+      <button id="btn-toggle-rotate" onclick="toggleARRotation()" class="bg-slate-900/85 hover:bg-slate-800 text-slate-200 border border-white/15 font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 backdrop-blur-md shadow-lg active:scale-95">
+        <i id="icon-toggle-rotate" data-lucide="pause" class="w-4 h-4 text-amber-400"></i>
+        <span id="text-toggle-rotate">Pausar Rotación</span>
+      </button>
+
+      <button onclick="toggleParticles()" class="bg-slate-900/85 hover:bg-slate-800 text-slate-200 border border-white/15 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 backdrop-blur-md shadow-lg active:scale-95">
+        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
+        <span>Partículas</span>
+      </button>
+
+      <button onclick="arConfettiAction()" class="bg-slate-900/85 hover:bg-slate-800 text-slate-200 border border-white/15 px-4 py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 backdrop-blur-md shadow-lg active:scale-95">
+        <i data-lucide="party-popper" class="w-4 h-4 text-emerald-400"></i>
+        <span>Confeti</span>
+      </button>
+
+      <button onclick="arTakePhotoAction()" class="bg-slate-900/85 hover:bg-slate-800 text-slate-200 border border-white/15 px-4 py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 backdrop-blur-md shadow-lg active:scale-95">
+        <i data-lucide="camera" class="w-4 h-4 text-rose-400"></i>
+        <span>Tomar Foto</span>
+      </button>
+    </div>
   </div>
 
+
   <!-- MODAL DE VISTA PREVIA DE FOTO CAPTURADA -->
-  <div id="photo-preview-modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-center justify-center p-4">
+  <div id="photo-preview-modal" class="fixed inset-0 bg-slate-950/95 z-[70] hidden flex-col items-center justify-center p-4">
     <div class="relative w-full max-w-2xl bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800">
         <h3 class="font-bold flex items-center space-x-2 text-base text-slate-100">
@@ -667,7 +685,7 @@
 
   
   <!-- MODAL DE GALERÍA DE TARJETAS DE ESCANEO (15 EQUIPOS) -->
-  <div id="targets-modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-center justify-center p-3 sm:p-5 backdrop-blur-md">
+  <div id="targets-modal" class="fixed inset-0 bg-slate-950/95 z-[70] hidden flex-col items-center justify-center p-3 sm:p-5 backdrop-blur-md">
     <div class="relative w-full max-w-6xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden flex flex-col max-h-[92vh] shadow-2xl">
       <div class="p-4 sm:p-5 border-b border-slate-800 flex justify-between items-center bg-slate-800/80">
         <div class="flex items-center space-x-3">
@@ -706,7 +724,7 @@
   </div>
 
   <!-- VISOR PANTALLA COMPLETA DE TARJETA INDIVIDUAL -->
-  <div id="single-card-viewer" class="fixed inset-0 bg-slate-950/98 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-md">
+  <div id="single-card-viewer" class="fixed inset-0 bg-slate-950/98 z-[80] hidden flex-col items-center justify-center p-4 backdrop-blur-md">
     <div class="relative w-full max-w-5xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800">
         <h4 id="single-card-title" class="font-black text-base text-slate-100 flex items-center gap-2">
@@ -736,6 +754,6 @@
       }
     });
   </script>
-  <script type="module" src="./js/main.js?v=20261025_04"></script>
+  <script type="module" src="./js/main.js?v=20261025_05"></script>
 </body>
 </html>

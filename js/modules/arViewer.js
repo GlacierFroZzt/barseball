@@ -1,11 +1,12 @@
 // Módulo de Realidad Aumentada (MindAR + A-Frame) - 15 Equipos Liga Nacional
-export const ASSET_VERSION = '20261025_04';
+export const ASSET_VERSION = '20261025_05';
 
 let isRotating = true;
 let isPerformingAction = false;
 let particlesVisible = true;
 let localConfettiInstance = null;
 let currentPhotoDataUrl = null;
+let currentDetectedTeam = null;
 
 // Registro de componentes A-Frame
 if (typeof AFRAME !== 'undefined' && !AFRAME.components['force-center-mesh']) {
@@ -19,17 +20,18 @@ if (typeof AFRAME !== 'undefined' && !AFRAME.components['force-center-mesh']) {
 if (typeof AFRAME !== 'undefined' && !AFRAME.components['target-detection-listener']) {
   AFRAME.registerComponent('target-detection-listener', {
     schema: {
-      name: { type: 'string' }
+      name: { type: 'string' },
+      teamId: { type: 'string' },
+      slug: { type: 'string' }
     },
     init: function () {
       this.el.addEventListener('targetFound', () => {
-        const badge = document.getElementById('ar-detection-badge');
-        const text = document.getElementById('ar-detection-text');
-        if (badge && text) {
-          text.textContent = 'Detectado: ' + this.data.name;
-          badge.classList.remove('hidden');
-          badge.classList.add('flex');
-        }
+        currentDetectedTeam = {
+          name: this.data.name,
+          teamId: this.data.teamId,
+          slug: this.data.slug
+        };
+        updateDetectedTeamUI(currentDetectedTeam);
       });
       this.el.addEventListener('targetLost', () => {
         const badge = document.getElementById('ar-detection-badge');
@@ -40,6 +42,28 @@ if (typeof AFRAME !== 'undefined' && !AFRAME.components['target-detection-listen
       });
     }
   });
+}
+
+function updateDetectedTeamUI(team) {
+  const badge = document.getElementById('ar-detection-badge');
+  const text = document.getElementById('ar-detection-text');
+  if (badge && text) {
+    text.textContent = 'Detectado: ' + team.name;
+    badge.classList.remove('hidden');
+    badge.classList.add('flex');
+  }
+
+  const btnHistory = document.getElementById('btn-team-history');
+  const textHistory = document.getElementById('text-team-history');
+  if (textHistory) {
+    textHistory.textContent = `Historia (${team.name})`;
+  }
+  if (btnHistory) {
+    btnHistory.classList.add('ring-2', 'ring-white', 'shadow-amber-400/50');
+  }
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 }
 
 if (typeof AFRAME !== 'undefined' && !AFRAME.components['star-particle']) {
@@ -124,21 +148,21 @@ function generateStarsAuraHTML(count = 35) {
 
 // Configuración de los 15 objetivos MindAR (índices 0 al 14 en targets_combined.mind basados en LogosBaseball.mind)
 export const AR_TARGETS = [
-  { index: 0, slug: 'braves', name: 'Atlanta Braves', type: 'jersey', modelSrc: './teams/braves/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 1, slug: 'brewers', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 2, slug: 'cardinals', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 3, slug: 'cubs', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 4, slug: 'diamondbacks', name: 'Arizona Diamondbacks', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 5, slug: 'dodgers', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 6, slug: 'giants', name: 'San Francisco Giants', type: 'ball', modelSrc: './teams/giants/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 7, slug: 'marlins', name: 'Miami Marlins', type: 'bat', modelSrc: './teams/marlins/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
-  { index: 8, slug: 'mets', name: 'New York Mets', type: 'bat', modelSrc: './teams/mets/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
-  { index: 9, slug: 'nationals', name: 'Washington Nationals', type: 'jersey', modelSrc: './teams/nationals/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 10, slug: 'padres', name: 'San Diego Padres', type: 'ball', modelSrc: './teams/padres/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 11, slug: 'phillies', name: 'Philadelphia Phillies', type: 'bat', modelSrc: './teams/phillies/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
-  { index: 12, slug: 'pirates', name: 'Pittsburgh Pirates', type: 'helmet', modelSrc: './teams/pirates/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 13, slug: 'reds', name: 'Cincinnati Reds', type: 'helmet', modelSrc: './teams/reds/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 14, slug: 'rockies', name: 'Colorado Rockies', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
+  { index: 0, slug: 'braves', teamId: '144', name: 'Atlanta Braves', type: 'jersey', modelSrc: './teams/braves/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 1, slug: 'brewers', teamId: '158', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 2, slug: 'cardinals', teamId: '138', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 3, slug: 'cubs', teamId: '112', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 4, slug: 'diamondbacks', teamId: '109', name: 'Arizona Diamondbacks', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 5, slug: 'dodgers', teamId: '119', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 6, slug: 'giants', teamId: '137', name: 'San Francisco Giants', type: 'ball', modelSrc: './teams/giants/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 7, slug: 'marlins', teamId: '146', name: 'Miami Marlins', type: 'bat', modelSrc: './teams/marlins/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 8, slug: 'mets', teamId: '121', name: 'New York Mets', type: 'bat', modelSrc: './teams/mets/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 9, slug: 'nationals', teamId: '120', name: 'Washington Nationals', type: 'jersey', modelSrc: './teams/nationals/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 10, slug: 'padres', teamId: '135', name: 'San Diego Padres', type: 'ball', modelSrc: './teams/padres/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 11, slug: 'phillies', teamId: '143', name: 'Philadelphia Phillies', type: 'bat', modelSrc: './teams/phillies/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
+  { index: 12, slug: 'pirates', teamId: '134', name: 'Pittsburgh Pirates', type: 'helmet', modelSrc: './teams/pirates/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 13, slug: 'reds', teamId: '113', name: 'Cincinnati Reds', type: 'helmet', modelSrc: './teams/reds/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 14, slug: 'rockies', teamId: '115', name: 'Colorado Rockies', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
 ];
 
 export async function openARModal() {
@@ -147,6 +171,12 @@ export async function openARModal() {
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
+
+  currentDetectedTeam = null;
+  const btnHistory = document.getElementById('btn-team-history');
+  const textHistory = document.getElementById('text-team-history');
+  if (textHistory) textHistory.textContent = "Ver Historia";
+  if (btnHistory) btnHistory.classList.remove('ring-2', 'ring-white', 'shadow-amber-400/50');
 
   // Detener y limpiar cámaras o escenas previas para evitar NotReadableError
   const oldScene = document.querySelector('a-scene');
@@ -203,7 +233,7 @@ export async function openARModal() {
 
     return `
       <!-- OBJETIVO ${t.index}: ${t.name} -->
-      <a-entity id="ar-target-${t.slug}" mindar-image-target="targetIndex: ${t.index}" target-detection-listener="name: ${t.name}">
+      <a-entity id="ar-target-${t.slug}" mindar-image-target="targetIndex: ${t.index}" target-detection-listener="name: ${t.name}; teamId: ${t.teamId}; slug: ${t.slug}">
         <a-entity id="anchor-${t.slug}" class="ar-anchor" data-rot-type="${t.rotType}" position="${t.pos}" rotation="${t.rot}">
           <a-entity id="rotator-${t.slug}" class="ar-rotator" data-rot-to="${rotTo}" data-rot-dur="${rotDur}" animation="property: rotation; to: ${rotTo}; dur: ${rotDur}; easing: linear; loop: true">
             ${contentHTML}
@@ -218,10 +248,14 @@ export async function openARModal() {
   }).join('\n');
 
   container.innerHTML = `
-    <!-- BADGE DE DETECCIÓN EN VIVO -->
-    <div id="ar-detection-badge" class="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white border border-emerald-500/50 px-4 py-2 rounded-full text-xs font-bold shadow-2xl hidden z-30 pointer-events-none items-center gap-2">
+    <!-- BADGE DE DETECCIÓN EN VIVO INTERACTIVO -->
+    <div id="ar-detection-badge" class="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white border border-emerald-500/50 px-4 py-2 rounded-full text-xs font-bold shadow-2xl hidden z-30 pointer-events-auto items-center gap-2.5 backdrop-blur-md cursor-pointer hover:bg-slate-800 transition" onclick="window.viewDetectedTeamHistory()">
       <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
       <span id="ar-detection-text"></span>
+      <span class="bg-orange-500 text-slate-950 text-[10px] px-2 py-0.5 rounded-full font-black ml-1 flex items-center gap-1">
+        <span>Historia</span>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+      </span>
     </div>
 
     <a-scene
@@ -577,9 +611,14 @@ export function renderTargetsGallery() {
               ${badgeText}
             </span>
           </div>
-          <a href="./targets_1280x720/${t.slug}_1280x720.png" download="${t.slug}_target_1280x720.png" class="p-2 bg-slate-800 hover:bg-orange-500 hover:text-slate-950 text-slate-300 rounded-xl transition" title="Descargar 1280x720 PNG">
-            <i data-lucide="download" class="w-4 h-4"></i>
-          </a>
+          <div class="flex items-center gap-1.5">
+            <button onclick="window.openTeamModal('${t.teamId}')" class="p-2 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 rounded-xl transition" title="Ver Historia de ${t.name}">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+            </button>
+            <a href="./targets_1280x720/${t.slug}_1280x720.png" download="${t.slug}_target_1280x720.png" class="p-2 bg-slate-800 hover:bg-orange-500 hover:text-slate-950 text-slate-300 rounded-xl transition" title="Descargar 1280x720 PNG">
+              <i data-lucide="download" class="w-4 h-4"></i>
+            </a>
+          </div>
         </div>
       </div>
     `;
@@ -588,6 +627,58 @@ export function renderTargetsGallery() {
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
   }
+}
+
+// Visualizador de historia del equipo detectado en AR
+export function viewDetectedTeamHistory() {
+  if (currentDetectedTeam && currentDetectedTeam.teamId) {
+    if (typeof window.openTeamModal === 'function') {
+      window.openTeamModal(currentDetectedTeam.teamId);
+    }
+  } else {
+    alert("¡Apunta la cámara a una tarjeta de equipo para ver su historia en tiempo real!");
+  }
+}
+
+// Alternar pantalla completa real en el Visor AR
+export function toggleARFullscreen() {
+  const modal = document.getElementById('ar-modal');
+  const icon = document.getElementById('icon-ar-fullscreen');
+  if (!document.fullscreenElement) {
+    if (modal && modal.requestFullscreen) {
+      modal.requestFullscreen().catch(err => {
+        console.warn('Error al activar pantalla completa:', err);
+      });
+    } else if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+    if (icon) icon.setAttribute('data-lucide', 'minimize');
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(err => {
+        console.warn('Error al salir de pantalla completa:', err);
+      });
+    }
+    if (icon) icon.setAttribute('data-lucide', 'maximize');
+  }
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('fullscreenchange', () => {
+    const icon = document.getElementById('icon-ar-fullscreen');
+    if (!icon) return;
+    if (document.fullscreenElement) {
+      icon.setAttribute('data-lucide', 'minimize');
+    } else {
+      icon.setAttribute('data-lucide', 'maximize');
+    }
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  });
 }
 
 window.viewTargetCardFullscreen = function(imgSrc, title) {
