@@ -1,4 +1,6 @@
 // Módulo de Realidad Aumentada (MindAR + A-Frame) - 15 Equipos Liga Nacional
+export const ASSET_VERSION = '20261025_04';
+
 let isRotating = true;
 let isPerformingAction = false;
 let particlesVisible = true;
@@ -9,12 +11,32 @@ let currentPhotoDataUrl = null;
 if (typeof AFRAME !== 'undefined' && !AFRAME.components['force-center-mesh']) {
   AFRAME.registerComponent('force-center-mesh', {
     init: function () {
-      this.el.addEventListener('model-loaded', () => {
-        const obj = this.el.getObject3D('mesh');
-        if (!obj) return;
-        const box = new THREE.Box3().setFromObject(obj);
-        const center = box.getCenter(new THREE.Vector3());
-        obj.position.sub(center);
+      // Los modelos 3D ya se exportaron de Blender perfectamente centrados en [0, 0, 0].
+    }
+  });
+}
+
+if (typeof AFRAME !== 'undefined' && !AFRAME.components['target-detection-listener']) {
+  AFRAME.registerComponent('target-detection-listener', {
+    schema: {
+      name: { type: 'string' }
+    },
+    init: function () {
+      this.el.addEventListener('targetFound', () => {
+        const badge = document.getElementById('ar-detection-badge');
+        const text = document.getElementById('ar-detection-text');
+        if (badge && text) {
+          text.textContent = 'Detectado: ' + this.data.name;
+          badge.classList.remove('hidden');
+          badge.classList.add('flex');
+        }
+      });
+      this.el.addEventListener('targetLost', () => {
+        const badge = document.getElementById('ar-detection-badge');
+        if (badge) {
+          badge.classList.add('hidden');
+          badge.classList.remove('flex');
+        }
       });
     }
   });
@@ -152,11 +174,6 @@ export async function openARModal() {
   particlesVisible = true;
   updateRotateButtonUI(true);
 
-  // Generar etiquetas de assets para modelos 3D activos
-  const assetItemsHTML = AR_TARGETS.filter(t => t.modelSrc).map(t => {
-    return `<a-asset-item id="asset-${t.slug}" src="${t.modelSrc}"></a-asset-item>`;
-  }).join('\n');
-
   // Generar entidades para los 15 objetivos
   const entitiesHTML = AR_TARGETS.map(t => {
     const isZRot = t.rotType === 'z';
@@ -168,10 +185,9 @@ export async function openARModal() {
       contentHTML = `
         <a-gltf-model 
           id="model-${t.slug}" 
-          src="#asset-${t.slug}" 
+          src="${t.modelSrc}?v=${ASSET_VERSION}" 
           position="0 0 0" 
-          scale="${t.scale}"
-          force-center-mesh>
+          scale="${t.scale}">
         </a-gltf-model>
       `;
     } else {
@@ -187,7 +203,7 @@ export async function openARModal() {
 
     return `
       <!-- OBJETIVO ${t.index}: ${t.name} -->
-      <a-entity id="ar-target-${t.slug}" mindar-image-target="targetIndex: ${t.index}">
+      <a-entity id="ar-target-${t.slug}" mindar-image-target="targetIndex: ${t.index}" target-detection-listener="name: ${t.name}">
         <a-entity id="anchor-${t.slug}" class="ar-anchor" data-rot-type="${t.rotType}" position="${t.pos}" rotation="${t.rot}">
           <a-entity id="rotator-${t.slug}" class="ar-rotator" data-rot-to="${rotTo}" data-rot-dur="${rotDur}" animation="property: rotation; to: ${rotTo}; dur: ${rotDur}; easing: linear; loop: true">
             ${contentHTML}
@@ -202,18 +218,20 @@ export async function openARModal() {
   }).join('\n');
 
   container.innerHTML = `
+    <!-- BADGE DE DETECCIÓN EN VIVO -->
+    <div id="ar-detection-badge" class="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white border border-emerald-500/50 px-4 py-2 rounded-full text-xs font-bold shadow-2xl hidden z-30 pointer-events-none items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      <span id="ar-detection-text"></span>
+    </div>
+
     <a-scene
       style="transform: scaleX(-1); -webkit-transform: scaleX(-1); width: 100%; height: 100%;"
       embedded
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
-      mindar-image="imageTargetSrc: ./targets_combined.mind; autoStart: true; uiLoading: no; uiError: no; uiScanning: no; filterMinCF: 0.0001; filterBeta: 0.001;"
+      mindar-image="imageTargetSrc: ./targets_combined.mind?v=${ASSET_VERSION}; autoStart: true; uiLoading: no; uiError: no; uiScanning: no;"
       color-space="sRGB"
       renderer="preserveDrawingBuffer: true;">
-      
-      <a-assets>
-        ${assetItemsHTML}
-      </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 

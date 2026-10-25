@@ -20,11 +20,20 @@
       ]
     },
     {
-      "source": "/(.*)\\.(glb|mind|mp4|png|jpg|jpeg|svg|webp)",
+      "source": "/(.*)\\.(glb|mind)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=604800, stale-while-revalidate=86400"
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(mp4|png|jpg|jpeg|svg|webp)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=43200"
         }
       ]
     }
