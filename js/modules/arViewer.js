@@ -158,9 +158,9 @@ export const AR_TARGETS = [
   { index: 1, slug: 'brewers', teamId: '158', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 2, slug: 'cardinals', teamId: '138', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 3, slug: 'cubs', teamId: '112', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 4, slug: 'diamondbacks', teamId: '109', name: 'Arizona Diamondbacks', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 4, slug: 'diamondbacks', teamId: '109', name: 'Arizona Diamondbacks', type: 'cap', modelSrc: './teams/diamondbacks/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 5, slug: 'dodgers', teamId: '119', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 6, slug: 'giants', teamId: '137', name: 'San Francisco Giants', type: 'ball', modelSrc: './teams/giants/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 6, slug: 'giants', teamId: '137', name: 'San Francisco Giants', type: 'cap', modelSrc: './teams/giants/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 7, slug: 'marlins', teamId: '146', name: 'Miami Marlins', type: 'bat', modelSrc: './teams/marlins/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
   { index: 8, slug: 'mets', teamId: '121', name: 'New York Mets', type: 'bat', modelSrc: './teams/mets/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
   { index: 9, slug: 'nationals', teamId: '120', name: 'Washington Nationals', type: 'jersey', modelSrc: './teams/nationals/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
@@ -168,7 +168,7 @@ export const AR_TARGETS = [
   { index: 11, slug: 'phillies', teamId: '143', name: 'Philadelphia Phillies', type: 'bat', modelSrc: './teams/phillies/model.glb', scale: '0.13 0.13 0.13', pos: '0 0 0.05', rot: '0 0 45', rotType: 'z' },
   { index: 12, slug: 'pirates', teamId: '134', name: 'Pittsburgh Pirates', type: 'helmet', modelSrc: './teams/pirates/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 13, slug: 'reds', teamId: '113', name: 'Cincinnati Reds', type: 'helmet', modelSrc: './teams/reds/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 14, slug: 'rockies', teamId: '115', name: 'Colorado Rockies', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
+  { index: 14, slug: 'rockies', teamId: '115', name: 'Colorado Rockies', type: 'cap', modelSrc: './teams/rockies/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' }
 ];
 
 export async function openARModal() {
@@ -599,6 +599,9 @@ export function renderTargetsGallery() {
     } else if (t.type === 'ball') {
       badgeText = 'Pelota 3D';
       badgeColor = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+    } else if (t.type === 'cap') {
+      badgeText = 'Gorra 3D';
+      badgeColor = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
     } else {
       badgeText = '3D Próximamente';
       badgeColor = 'bg-slate-700/50 text-slate-400 border-slate-600';
