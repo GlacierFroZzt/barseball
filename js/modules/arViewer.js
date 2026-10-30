@@ -157,7 +157,7 @@ export const AR_TARGETS = [
   { index: 0, slug: 'braves', teamId: '144', name: 'Atlanta Braves', type: 'jersey', modelSrc: './teams/braves/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 1, slug: 'brewers', teamId: '158', name: 'Milwaukee Brewers', type: 'jersey', modelSrc: './teams/brewers/model.glb', scale: '0.66 0.66 0.66', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 2, slug: 'cardinals', teamId: '138', name: 'St. Louis Cardinals', type: 'helmet', modelSrc: './teams/cardinals/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
-  { index: 3, slug: 'cubs', teamId: '112', name: 'Chicago Cubs', type: 'pending', modelSrc: null, scale: '0.4 0.4 0.4', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
+  { index: 3, slug: 'cubs', teamId: '112', name: 'Chicago Cubs', type: 'ball', modelSrc: './teams/cubs/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 4, slug: 'diamondbacks', teamId: '109', name: 'Arizona Diamondbacks', type: 'cap', modelSrc: './teams/diamondbacks/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 5, slug: 'dodgers', teamId: '119', name: 'Los Angeles Dodgers', type: 'ball', modelSrc: './teams/dodgers/model.glb', scale: '0.34 0.34 0.34', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
   { index: 6, slug: 'giants', teamId: '137', name: 'San Francisco Giants', type: 'cap', modelSrc: './teams/giants/model.glb', scale: '0.38 0.38 0.38', pos: '0 0 0.05', rot: '0 0 0', rotType: 'y' },
