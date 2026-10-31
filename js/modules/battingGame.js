@@ -399,9 +399,9 @@ function handleHit(basesToAdvance) {
     }
     gameState.runs += scored;
     if (typeof window.addCoins === 'function') {
-      window.addCoins(scored, `¡HOME RUN! (+\${scored} R, +\${scored} 🪙)`);
+      window.addCoins(scored, `¡HOME RUN! (+${scored} R, +${scored} 🪙)`);
     }
-    triggerFeedback(`¡HOME RUN! (+\${scored} R, +\${scored} 🪙)`, "#fbbf24");
+    triggerFeedback(`¡HOME RUN! (+${scored} R, +${scored} 🪙)`, "#fbbf24");
   } else if (basesToAdvance === 2) {
     let scored = 0;
     if (gameState.bases[2]) { scored++; gameState.bases[2] = false; }
@@ -410,9 +410,9 @@ function handleHit(basesToAdvance) {
     gameState.bases[1] = true;
     gameState.runs += scored;
     if (scored > 0 && typeof window.addCoins === 'function') {
-      window.addCoins(scored, `¡DOBLETE IMPULSOR! (+\${scored} 🪙)`);
+      window.addCoins(scored, `¡DOBLETE IMPULSOR! (+${scored} 🪙)`);
     }
-    triggerFeedback(scored > 0 ? `¡DOBLETE! (+\${scored} R, +\${scored} 🪙)` : "¡DOBLE!", "#38bdf8");
+    triggerFeedback(scored > 0 ? `¡DOBLETE! (+${scored} R, +${scored} 🪙)` : "¡DOBLE!", "#38bdf8");
   } else {
     let scored = 0;
     if (gameState.bases[2]) { scored++; gameState.bases[2] = false; }
@@ -421,9 +421,9 @@ function handleHit(basesToAdvance) {
     gameState.bases[0] = true;
     gameState.runs += scored;
     if (scored > 0 && typeof window.addCoins === 'function') {
-      window.addCoins(scored, `¡HIT IMPULSOR! (+\${scored} 🪙)`);
+      window.addCoins(scored, `¡HIT IMPULSOR! (+${scored} 🪙)`);
     }
-    triggerFeedback(scored > 0 ? `¡HIT IMPULSOR! (+\${scored} R, +\${scored} 🪙)` : "¡SENCILLO!", "#fbbf24");
+    triggerFeedback(scored > 0 ? `¡HIT IMPULSOR! (+${scored} R, +${scored} 🪙)` : "¡SENCILLO!", "#fbbf24");
   }
 
   nextBatter();
