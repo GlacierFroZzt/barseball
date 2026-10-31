@@ -76,6 +76,7 @@ export function initGameCanvas() {
   updateScoreboard();
   drawGameScene();
   setupButtonListeners();
+  checkGameOrientation();
 }
 
 export function startGame() {
@@ -1021,11 +1022,101 @@ function setupButtonListeners() {
   }
 }
 
+
+// -------------------------------------------------------------
+// CONTROLADOR DE ORIENTACIÓN LANDSCAPE Y PANTALLA COMPLETA
+// -------------------------------------------------------------
+
+export async function launchGameFullscreen() {
+  const gameSection = document.getElementById('page-juego');
+  if (!gameSection) return;
+
+  try {
+    if (!document.fullscreenElement) {
+      if (gameSection.requestFullscreen) {
+        await gameSection.requestFullscreen();
+      } else if (gameSection.webkitRequestFullscreen) {
+        await gameSection.webkitRequestFullscreen();
+      }
+    }
+  } catch (err) {
+    console.warn('Fullscreen request:', err);
+  }
+
+  try {
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock('landscape');
+    }
+  } catch (err) {
+    console.warn('Orientation lock:', err);
+  }
+
+  checkGameOrientation();
+}
+
+export function toggleGameFullscreen() {
+  if (document.fullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  } else {
+    launchGameFullscreen();
+  }
+}
+
+export function checkGameOrientation() {
+  const blocker = document.getElementById('game-orientation-blocker');
+  if (!blocker) return;
+
+  const isPortraitMobile = window.matchMedia('(orientation: portrait) and (max-width: 1024px)').matches;
+  if (isPortraitMobile) {
+    blocker.classList.remove('hidden');
+    blocker.classList.add('flex');
+    if (gameState.running) {
+      stopGame();
+    }
+  } else {
+    blocker.classList.add('hidden');
+    blocker.classList.remove('flex');
+  }
+}
+
+function handleFullscreenChange() {
+  const btn = document.getElementById('btn-game-fullscreen');
+  const icon = document.getElementById('icon-game-fullscreen');
+  if (!btn || !icon) return;
+
+  if (document.fullscreenElement) {
+    icon.innerHTML = `
+      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+    `;
+    btn.setAttribute('title', 'Salir de Pantalla Completa');
+  } else {
+    icon.innerHTML = `
+      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+    `;
+    btn.setAttribute('title', 'Pantalla Completa');
+  }
+}
+
+window.addEventListener('resize', checkGameOrientation);
+window.addEventListener('orientationchange', checkGameOrientation);
+if (screen.orientation) {
+  screen.orientation.addEventListener('change', checkGameOrientation);
+}
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
 // Exposición global a window (asegura compatibilidad total con llamadas inline y módulos ES6)
 window.startGame = startGame;
 window.stopGame = stopGame;
 window.swingBat = swingBat;
 window.initGameCanvas = initGameCanvas;
+window.launchGameFullscreen = launchGameFullscreen;
+window.toggleGameFullscreen = toggleGameFullscreen;
+window.checkGameOrientation = checkGameOrientation;
 
 // Auto-inicialización cuando el DOM esté listo
 if (document.readyState === 'loading') {

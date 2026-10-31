@@ -354,100 +354,146 @@
     </section>
 
     <!-- SECCIÓN MINI JUEGO -->
-    <section id="page-juego" class="page-content hidden space-y-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-800 p-6 rounded-2xl border border-slate-700">
-        <div>
-          <h2 class="text-2xl font-black flex items-center space-x-2">
-            <i data-lucide="gamepad-2" class="text-amber-400"></i>
-            <span>Partido de Béisbol - Entrada Completa</span>
-          </h2>
-          <p class="text-sm text-slate-400">Consigue la mayor cantidad de carreras antes de que te canten los <strong>3 Outs</strong> reglamentarios.</p>
+    <section id="page-juego" class="page-content hidden relative">
+
+      <!-- ROTATION BLOCKER OVERLAY (Forzador de orientación horizontal en móvil) -->
+      <div id="game-orientation-blocker" class="hidden fixed inset-0 z-[60] bg-slate-950/95 backdrop-blur-md flex-col items-center justify-center p-6 text-center space-y-6">
+        <div class="relative w-28 h-28 flex items-center justify-center">
+          <div class="w-16 h-24 border-4 border-amber-400 rounded-2xl animate-phone-rotate flex items-center justify-center shadow-xl shadow-amber-500/20 bg-slate-900/60">
+            <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+          </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto">
-          <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
-            <button id="btn-start" onclick="startGame()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 text-xs sm:text-sm shadow-md shadow-emerald-500/20 active:scale-95">
-              <i data-lucide="play" class="w-4 h-4"></i>
-              <span>Play Ball</span>
-            </button>
-            <button id="btn-stop" onclick="stopGame()" disabled class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1.5 text-xs sm:text-sm active:scale-95">
-              <i data-lucide="square" class="w-4 h-4"></i>
-              <span>Detener</span>
-            </button>
-          </div>
-          <button id="btn-swing" onclick="swingBat()" disabled class="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black px-7 py-3 sm:py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base shadow-xl shadow-amber-500/30 active:scale-95">
-            <i data-lucide="zap" class="w-5 h-5"></i>
-            <span>¡BATEAR!</span>
-          </button>
+        <div class="space-y-2 max-w-sm">
+          <h3 class="text-2xl font-black text-slate-100 tracking-tight flex items-center justify-center gap-2">
+            <span class="text-amber-400">📱</span> Acuesta tu celular
+          </h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Para jugar al partido de béisbol, debes colocar tu dispositivo en <strong>posición horizontal (Landscape)</strong>.
+          </p>
         </div>
+
+        <button onclick="launchGameFullscreen()" class="px-6 py-3.5 rounded-2xl font-black text-sm bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-slate-950 flex items-center space-x-2 shadow-xl shadow-orange-500/30 active:scale-95 transition transform cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+          <span>Girar y Pantalla Completa</span>
+        </button>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- MARCADOR DE ESTADIO -->
-        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-5">
-          <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-            <h3 class="font-black text-lg text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
-              <span>Scoreboard</span>
-            </h3>
-            <span class="text-xs bg-slate-900 text-orange-400 font-mono px-2 py-1 rounded border border-slate-700">1ra Alta ▲</span>
-          </div>
-
-          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 grid grid-cols-3 gap-2 text-center">
-            <div>
-              <span class="text-xs font-bold text-slate-400 block">CARRERAS</span>
-              <span id="score-runs" class="text-3xl font-black text-amber-400 font-mono">0</span>
-            </div>
-            <div>
-              <span class="text-xs font-bold text-slate-400 block">HITS</span>
-              <span id="score-hits" class="text-3xl font-black text-sky-400 font-mono">0</span>
-            </div>
-            <div>
-              <span class="text-xs font-bold text-slate-400 block">OUTS</span>
-              <span id="score-outs" class="text-3xl font-black text-rose-500 font-mono">0/3</span>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/60 space-y-1">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Al Bate</span>
-            <div class="flex items-center justify-between">
-              <span id="current-batter-name" class="font-black text-sm text-slate-100">Cargando...</span>
-              <span id="current-batter-avg" class="text-xs font-mono font-bold text-orange-400">.000 AVG</span>
-            </div>
-          </div>
-
-          <div class="space-y-3 pt-1">
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-slate-400">Lanzamiento:</span>
-              <span id="pitch-type" class="font-bold text-orange-400 font-mono">Esperando...</span>
-            </div>
-
-            <div class="space-y-2 bg-slate-900/50 p-3 rounded-xl border border-slate-800 text-xs">
-              <div class="flex justify-between items-center">
-                <span class="font-bold text-emerald-400">Bolas (4 = Base):</span>
-                <span id="ball-count" class="font-mono font-bold text-emerald-400 text-sm">0</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="font-bold text-rose-400">Strikes (3 = Out):</span>
-                <span id="strike-count" class="font-mono font-bold text-rose-400 text-sm">0</span>
+      <!-- CONTENEDOR PRINCIPAL: 2 COLUMNAS (TABLA + CONTROLES Y VISUALIZACIÓN) -->
+      <div class="game-columns-container grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch w-full min-h-[500px]">
+        
+        <!-- COLUMNA 1: TABLA DE PUNTUACIONES Y BOTONES DE JUEGO -->
+        <div class="game-panel-controls flex flex-col justify-between space-y-3 bg-slate-900/90 p-4 sm:p-5 rounded-2xl border border-slate-700/80 shadow-2xl">
+          
+          <!-- CABECERA DEL PANEL -->
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">⚾</span>
+              <div>
+                <h3 class="font-black text-sm sm:text-base text-slate-100">Scoreboard LN</h3>
+                <span id="active-team-badge" class="text-[10px] text-orange-400 font-bold block truncate max-w-[180px] sm:max-w-[240px]">Representando a: Atlanta Braves</span>
               </div>
             </div>
-          </div>
 
-          <div class="border-t border-slate-700/60 pt-3">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2 text-center">Bases Ocupadas</span>
-            <div class="flex justify-center items-center gap-4 text-xs font-bold">
-              <div id="base-indicator-3" class="px-2.5 py-1 rounded bg-slate-900 text-slate-500 border border-slate-700">3B</div>
-              <div id="base-indicator-2" class="px-2.5 py-1 rounded bg-slate-900 text-slate-500 border border-slate-700">2B</div>
-              <div id="base-indicator-1" class="px-2.5 py-1 rounded bg-slate-900 text-slate-500 border border-slate-700">1B</div>
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] bg-slate-950 text-orange-400 font-mono px-2 py-0.5 rounded border border-slate-700 font-bold">1ra Alta ▲</span>
+              <!-- BOTÓN PANTALLA COMPLETA -->
+              <button id="btn-game-fullscreen" onclick="toggleGameFullscreen()" class="p-1.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-400 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer" title="Alternar Pantalla Completa">
+                <svg id="icon-game-fullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+              </button>
             </div>
           </div>
+
+          <!-- TABLA DE PUNTUACIONES (MARCADOR COMPACTO) -->
+          <div class="space-y-2.5 flex-1 flex flex-col justify-center">
+            
+            <!-- MARCADOR DE 3 CIFRAS -->
+            <div class="bg-slate-950 p-2.5 sm:p-3 rounded-xl border border-slate-800 grid grid-cols-3 gap-2 text-center shadow-inner">
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block tracking-wider">CARRERAS</span>
+                <span id="score-runs" class="text-2xl sm:text-3xl font-black text-amber-400 font-mono">0</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block tracking-wider">HITS</span>
+                <span id="score-hits" class="text-2xl sm:text-3xl font-black text-sky-400 font-mono">0</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block tracking-wider">OUTS</span>
+                <span id="score-outs" class="text-2xl sm:text-3xl font-black text-rose-500 font-mono">0/3</span>
+              </div>
+            </div>
+
+            <!-- JUGADOR AL BATE & RADAR DE LANZAMIENTO -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-center">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Al Bate</span>
+                <span id="current-batter-name" class="font-black text-xs sm:text-sm text-slate-100 truncate">Cargando...</span>
+                <span id="current-batter-avg" class="text-[10px] font-mono font-bold text-orange-400">.000 AVG</span>
+              </div>
+
+              <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-center">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lanzamiento</span>
+                <span id="pitch-type" class="font-bold text-orange-400 font-mono text-xs sm:text-sm truncate">Esperando...</span>
+              </div>
+            </div>
+
+            <!-- CONTEO BOLAS/STRIKES & BASES -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800 flex items-center justify-around">
+                <div class="text-center">
+                  <span class="text-[10px] font-bold text-emerald-400 block">Bolas</span>
+                  <span id="ball-count" class="font-mono font-black text-emerald-400 text-sm">0</span>
+                </div>
+                <div class="h-6 w-px bg-slate-800"></div>
+                <div class="text-center">
+                  <span class="text-[10px] font-bold text-rose-400 block">Strikes</span>
+                  <span id="strike-count" class="font-mono font-black text-rose-400 text-sm">0</span>
+                </div>
+              </div>
+
+              <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800 flex items-center justify-center space-x-2">
+                <span class="text-[10px] font-bold text-slate-400 mr-1">Bases:</span>
+                <div id="base-indicator-3" class="px-2 py-0.5 rounded bg-slate-900 text-slate-500 border border-slate-700 text-[10px] font-black">3B</div>
+                <div id="base-indicator-2" class="px-2 py-0.5 rounded bg-slate-900 text-slate-500 border border-slate-700 text-[10px] font-black">2B</div>
+                <div id="base-indicator-1" class="px-2 py-0.5 rounded bg-slate-900 text-slate-500 border border-slate-700 text-[10px] font-black">1B</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BOTONES DE JUEGO -->
+          <div class="pt-2 border-t border-slate-800 space-y-2">
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-start" onclick="startGame()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-black py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 text-xs sm:text-sm shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Play Ball</span>
+              </button>
+              <button id="btn-stop" onclick="stopGame()" disabled class="bg-rose-500 hover:bg-rose-600 text-white font-black py-2.5 px-3 rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center space-x-1.5 text-xs sm:text-sm active:scale-95 cursor-pointer">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                <span>Detener</span>
+              </button>
+            </div>
+
+            <!-- BOTÓN GIGANTE DE BATEAR -->
+            <button id="btn-swing" onclick="swingBat()" disabled class="w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:opacity-95 text-slate-950 font-black py-3 sm:py-3.5 px-4 rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-base sm:text-lg shadow-xl shadow-amber-500/30 active:scale-95 cursor-pointer">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>¡BATEAR!</span>
+            </button>
+          </div>
+
         </div>
 
-        <div class="lg:col-span-3 bg-slate-950 p-2 sm:p-4 rounded-2xl border border-slate-800 flex flex-col items-center justify-center relative min-h-[360px] sm:min-h-[460px] overflow-hidden">
-          <canvas id="gameCanvas" width="400" height="460" class="w-full max-w-[360px] sm:max-w-[400px] h-auto aspect-[400/460] bg-slate-900 rounded-2xl border-2 border-slate-700 transition-all duration-300 shadow-2xl"></canvas>
+        <!-- COLUMNA 2: VISUALIZACIÓN DEL ESTADIO (CANVAS) -->
+        <div class="game-panel-canvas bg-slate-950 p-2 sm:p-3 rounded-2xl border border-slate-800 flex items-center justify-center relative overflow-hidden shadow-2xl">
+          <canvas id="gameCanvas" width="400" height="460" class="h-full w-auto max-h-[85vh] sm:max-h-[500px] aspect-[400/460] bg-slate-900 rounded-xl border-2 border-slate-700 transition-all duration-300 shadow-2xl object-contain"></canvas>
         </div>
+
       </div>
+
     </section>
 
     <!-- SECCIÓN TORNEO -->

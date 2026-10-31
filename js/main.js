@@ -283,6 +283,11 @@ export function showPage(pageId) {
 
   if (pageId === 'juego') {
     setTimeout(initGameCanvas, 50);
+    setTimeout(() => {
+      if (typeof window.checkGameOrientation === 'function') {
+        window.checkGameOrientation();
+      }
+    }, 80);
     updateActiveTeamBadge();
   }
   if (pageId === 'torneo') {

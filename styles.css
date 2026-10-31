@@ -86,12 +86,82 @@ body.menu-open {
   }
 }
 
+/* ==============================================================
+   MINI JUEGO: ROTACIÓN OBLIGATORIA & PANTALLA COMPLETA EN 2 COLUMNAS
+   ============================================================== */
+
+@keyframes phoneRotate {
+  0%, 15% {
+    transform: rotate(0deg);
+  }
+  45%, 65% {
+    transform: rotate(-90deg);
+  }
+  85%, 100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-phone-rotate {
+  animation: phoneRotate 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Bloqueo en orientación vertical en móviles/tablets (forzar acostar el celular) */
+@media (orientation: portrait) and (max-width: 1024px) {
+  #page-juego #game-orientation-blocker {
+    display: flex !important;
+  }
+}
+
+/* Modo Pantalla Completa inmersivo de 2 columnas para #page-juego */
+#page-juego:fullscreen,
+#page-juego:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 10px !important;
+  background-color: #0b0f17 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+#page-juego:fullscreen .game-columns-container,
+#page-juego:-webkit-full-screen .game-columns-container {
+  flex: 1 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+#page-juego:fullscreen .game-panel-controls,
+#page-juego:-webkit-full-screen .game-panel-controls {
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+#page-juego:fullscreen .game-panel-canvas,
+#page-juego:-webkit-full-screen .game-panel-canvas {
+  height: 100% !important;
+}
+
+#page-juego:fullscreen #gameCanvas,
+#page-juego:-webkit-full-screen #gameCanvas {
+  max-height: calc(100vh - 28px) !important;
+  width: auto !important;
+  height: 100% !important;
+}
+
 /* Canvas responsiveness & touch ergonomics for batting mini-game */
 #gameCanvas {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   max-width: 100%;
-  height: auto;
 }
 
 /* Utility to hide scrollbars smoothly on horizontal tab filters */
