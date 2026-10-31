@@ -29,3 +29,81 @@
   height: 100%;
   object-fit: contain;
 }
+
+/* ==============================================================
+   PHONE-FIRST & DRAWER NAVIGATION UTILITIES
+   ============================================================== */
+
+/* Safe area insets support for modern mobile devices (iOS / Android) */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+body.menu-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* Off-canvas Mobile Drawer transition */
+#mobile-drawer {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+#mobile-drawer.drawer-open {
+  transform: translateX(0) !important;
+}
+
+#mobile-drawer-backdrop {
+  transition: opacity 0.3s ease-in-out;
+}
+
+#mobile-drawer-backdrop.backdrop-active {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Fallback visibility rules ensuring mobile hamburger is always visible on phones/tablets */
+@media (max-width: 1279px) {
+  header nav {
+    display: none !important;
+  }
+  #auth-nav-container {
+    display: none !important;
+  }
+  #btn-mobile-menu-open {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  #btn-mobile-menu-open {
+    display: none !important;
+  }
+  #auth-nav-container {
+    display: flex !important;
+  }
+}
+
+/* Canvas responsiveness & touch ergonomics for batting mini-game */
+#gameCanvas {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Utility to hide scrollbars smoothly on horizontal tab filters */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth touch scrolling on iOS */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}

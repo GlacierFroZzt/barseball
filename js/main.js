@@ -25,6 +25,9 @@ import { initNewTriviaGame } from './modules/trivia.js';
 
 // Exposición global
 window.showPage = showPage;
+window.openMobileMenu = openMobileMenu;
+window.closeMobileMenu = closeMobileMenu;
+window.toggleMobileMenu = toggleMobileMenu;
 window.handleAuthSubmit = handleAuthSubmit;
 window.toggleAuthTab = toggleAuthTab;
 window.logoutUser = logoutUser;
@@ -224,7 +227,52 @@ export function renderTournamentTable() {
 // CONTROLADOR DE NAVEGACIÓN Y MODALES
 // -------------------------------------------------------------
 
+export function openMobileMenu() {
+  const drawer = document.getElementById('mobile-drawer');
+  const backdrop = document.getElementById('mobile-drawer-backdrop');
+  if (!drawer || !backdrop) return;
+
+  backdrop.classList.remove('hidden');
+  void backdrop.offsetWidth;
+  backdrop.classList.add('backdrop-active');
+  drawer.classList.add('drawer-open');
+  document.body.classList.add('menu-open');
+}
+
+export function closeMobileMenu() {
+  const drawer = document.getElementById('mobile-drawer');
+  const backdrop = document.getElementById('mobile-drawer-backdrop');
+  if (!drawer || !backdrop) return;
+
+  drawer.classList.remove('drawer-open');
+  backdrop.classList.remove('backdrop-active');
+  document.body.classList.remove('menu-open');
+
+  setTimeout(() => {
+    if (!drawer.classList.contains('drawer-open')) {
+      backdrop.classList.add('hidden');
+    }
+  }, 300);
+}
+
+export function toggleMobileMenu() {
+  const drawer = document.getElementById('mobile-drawer');
+  if (drawer && drawer.classList.contains('drawer-open')) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeMobileMenu();
+  }
+});
+
 export function showPage(pageId) {
+  closeMobileMenu();
+
   document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
   const targetPage = document.getElementById(`page-${pageId}`);
   if (targetPage) targetPage.classList.remove('hidden');
@@ -245,7 +293,7 @@ export function showPage(pageId) {
   if (pageId === 'tienda') renderStorePage();
   if (pageId === 'perfil') renderProfilePage();
 
-  // Actualizar clase activa en barra de navegación
+  // Actualizar clase activa en barra de navegacion de escritorio
   document.querySelectorAll('.nav-link').forEach(btn => {
     btn.classList.remove('active', 'text-white', 'bg-white/10');
     btn.classList.add('text-slate-400');
@@ -256,9 +304,21 @@ export function showPage(pageId) {
     }
   });
 
+  // Actualizar clase activa en enlaces del menu lateral movil
+  document.querySelectorAll('.mobile-nav-link').forEach(btn => {
+    btn.classList.remove('active', 'text-orange-400', 'bg-orange-500/10', 'border-orange-500/30');
+    btn.classList.add('text-slate-300');
+    const onclickAttr = btn.getAttribute('onclick') || '';
+    if (onclickAttr.includes(`'${pageId}'`)) {
+      btn.classList.add('active', 'text-orange-400', 'bg-orange-500/10', 'border-orange-500/30');
+      btn.classList.remove('text-slate-300');
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
   refreshIcons();
 }
-
 export function refreshIcons() {
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();

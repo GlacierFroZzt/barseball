@@ -132,6 +132,9 @@ export function addCoins(amount, feedbackMessage = null) {
   const navCoins = document.getElementById('nav-coins-count');
   if (navCoins) navCoins.textContent = user.coins;
 
+  const drawerCoins = document.getElementById('drawer-coins-count');
+  if (drawerCoins) drawerCoins.textContent = user.coins;
+
   const storeCoins = document.getElementById('store-user-coins');
   if (storeCoins) storeCoins.textContent = user.coins;
 
@@ -289,7 +292,7 @@ export function logoutUser() {
 
 export function updateAuthUI() {
   const container = document.getElementById('auth-nav-container');
-  if (!container) return;
+  const drawerContainer = document.getElementById('auth-drawer-container');
 
   const session = getActiveSession();
   const user = getActiveUser();
@@ -303,65 +306,134 @@ export function updateAuthUI() {
   };
   const currentAvatarIcon = avatarEmojiMap[user.equipped.avatar] || '⚾';
 
-  if (session) {
-    const firstName = session.name.split(' ')[0];
-    container.innerHTML = `
-      <div class="flex items-center space-x-2">
-        <!-- Balance de monedas en navbar -->
-        <div onclick="showPage('tienda')" title="Ir a la Tienda de Cosméticos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
-          <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
-          <span id="nav-coins-count" class="font-mono text-amber-300 font-black">${user.coins}</span>
-        </div>
+  // Sincronizar contador de monedas si existe en el drawer
+  const drawerCoins = document.getElementById('drawer-coins-count');
+  if (drawerCoins) drawerCoins.textContent = user.coins;
 
-        <!-- Botón Temporal +10 Monedas (Test) -->
-        <button onclick="claimTestCoins(10)" title="Botón Temporal: Ganar +10 Monedas sin jugar" class="px-2.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 flex items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition">
-          <span>+10</span>
-          <span>🪙</span>
-          <span class="hidden sm:inline text-[10px] uppercase font-bold opacity-80">(Test)</span>
-        </button>
-
-        <!-- Botón de Mi Perfil -->
-        <button onclick="showPage('perfil')" title="Ver Mi Perfil" class="flex items-center space-x-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-orange-500/50 py-1.5 px-3 rounded-xl text-sm transition">
-          <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs border border-orange-500/40">
-            ${currentAvatarIcon}
+  // 1. Renderizar contenedor de barra superior (Desktop)
+  if (container) {
+    if (session) {
+      const firstName = session.name.split(' ')[0];
+      container.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <!-- Balance de monedas en navbar -->
+          <div onclick="showPage('tienda')" title="Ir a la Tienda de Cosméticos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
+            <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
+            <span id="nav-coins-count" class="font-mono text-amber-300 font-black">${user.coins}</span>
           </div>
-          <span class="font-bold text-slate-200 hidden sm:inline">${firstName}</span>
-        </button>
 
-        <!-- Cerrar Sesión -->
-        <button onclick="logoutUser()" title="Cerrar Sesión" class="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
-      </div>
-    `;
-  } else {
-    container.innerHTML = `
-      <div class="flex items-center space-x-2">
-        <!-- Balance de monedas en navbar para invitado -->
-        <div onclick="showPage('tienda')" title="Ir a la Tienda de Cosméticos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
-          <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
-          <span id="nav-coins-count" class="font-mono text-amber-300 font-black">${user.coins}</span>
+          <!-- Botón Temporal +10 Monedas (Test) -->
+          <button onclick="claimTestCoins(10)" title="Botón Temporal: Ganar +10 Monedas sin jugar" class="px-2.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 flex items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition">
+            <span>+10</span>
+            <span>🪙</span>
+            <span class="hidden sm:inline text-[10px] uppercase font-bold opacity-80">(Test)</span>
+          </button>
+
+          <!-- Botón de Mi Perfil -->
+          <button onclick="showPage('perfil')" title="Ver Mi Perfil" class="flex items-center space-x-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-orange-500/50 py-1.5 px-3 rounded-xl text-sm transition">
+            <div class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs border border-orange-500/40">
+              ${currentAvatarIcon}
+            </div>
+            <span class="font-bold text-slate-200 hidden sm:inline">${firstName}</span>
+          </button>
+
+          <!-- Cerrar Sesión -->
+          <button onclick="logoutUser()" title="Cerrar Sesión" class="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
         </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <!-- Balance de monedas en navbar para invitado -->
+          <div onclick="showPage('tienda')" title="Ir a la Tienda de Cosméticos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
+            <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
+            <span id="nav-coins-count" class="font-mono text-amber-300 font-black">${user.coins}</span>
+          </div>
 
-        <!-- Botón Temporal +10 Monedas (Test) -->
-        <button onclick="claimTestCoins(10)" title="Botón Temporal: Ganar +10 Monedas sin jugar" class="px-2.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 flex items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition">
-          <span>+10</span>
-          <span>🪙</span>
-          <span class="hidden sm:inline text-[10px] uppercase font-bold opacity-80">(Test)</span>
-        </button>
+          <!-- Botón Temporal +10 Monedas (Test) -->
+          <button onclick="claimTestCoins(10)" title="Botón Temporal: Ganar +10 Monedas sin jugar" class="px-2.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 flex items-center space-x-1 shadow-md shadow-amber-500/20 active:scale-95 transition">
+            <span>+10</span>
+            <span>🪙</span>
+            <span class="hidden sm:inline text-[10px] uppercase font-bold opacity-80">(Test)</span>
+          </button>
 
-        <!-- Botón Mi Perfil Invitado -->
-        <button onclick="showPage('perfil')" title="Ver Mi Perfil" class="p-2 rounded-xl text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition">
-          <i data-lucide="user" class="w-4 h-4"></i>
-        </button>
+          <!-- Botón Mi Perfil Invitado -->
+          <button onclick="showPage('perfil')" title="Ver Mi Perfil" class="p-2 rounded-xl text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </button>
 
-        <!-- Botón Ingresar -->
-        <button onclick="showPage('login')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition">
-          Ingresar
-        </button>
-      </div>
-    `;
+          <!-- Botón Ingresar -->
+          <button onclick="showPage('login')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition">
+            Ingresar
+          </button>
+        </div>
+      `;
+    }
   }
 
-  if (window.lucide) lucide.createIcons();
+  // 2. Renderizar contenedor de usuario en Menú Lateral (Drawer Móvil)
+  if (drawerContainer) {
+    if (session) {
+      drawerContainer.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-center space-x-3 bg-slate-950/70 p-3 rounded-2xl border border-white/10">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 p-0.5 flex items-center justify-center shadow-lg shadow-orange-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-lg">
+                ${currentAvatarIcon}
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center space-x-1.5">
+                <span class="font-black text-sm text-slate-100 truncate">${session.name}</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full font-bold">Activo</span>
+              </div>
+              <p class="text-xs text-slate-400 truncate">${session.email}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="showPage('perfil')" class="flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-200 transition">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-orange-400"></i>
+              <span>Mi Perfil</span>
+            </button>
+            <button onclick="logoutUser()" class="flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-xs font-bold text-rose-300 transition">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      drawerContainer.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-center space-x-3 bg-slate-950/70 p-3 rounded-2xl border border-white/10">
+            <div class="w-11 h-11 rounded-2xl bg-slate-800 border border-white/10 flex items-center justify-center text-lg flex-shrink-0 text-slate-400">
+              ⚾
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="font-black text-sm text-slate-200 block">Modo Invitado</span>
+              <p class="text-xs text-slate-400">Inicia sesión para guardar tu progreso</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="showPage('login')" class="flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-black text-slate-950 transition shadow-md shadow-orange-500/20">
+              <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+              <span>Ingresar</span>
+            </button>
+            <button onclick="showPage('perfil')" class="flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-200 transition">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>Perfil</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    lucide.createIcons();
+  }
 }
