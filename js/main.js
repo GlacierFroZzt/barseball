@@ -1,7 +1,17 @@
 import { nlTeamsDatabase } from './data/teamsData.js';
 import { updateAuthUI, handleAuthSubmit, toggleAuthTab, logoutUser, addCoins, recordGameStats, getActiveUser, updateActiveUser } from './modules/auth.js';
 import { renderStorePage, renderProfilePage, buyCosmetic, equipCosmetic, setStoreFilter, setProfileTab, claimTestCoins, showToastNotification } from './modules/store.js';
-import { togglePlayPause, changeVolume, applyPreset, updateColorAdjustments } from './modules/videoFilters.js';
+import { 
+  togglePlayPause, 
+  changeVolume, 
+  applyPreset, 
+  updateColorAdjustments,
+  toggleVideoRecording,
+  recordQuickClip,
+  captureVideoSnapshot,
+  closeVideoSavedModal,
+  downloadAgainRecordedVideo
+} from './modules/videoFilters.js';
 import { 
   openARModal, 
   closeARModal, 
@@ -13,12 +23,23 @@ import {
   arTakePhotoAction, 
   closePhotoPreview, 
   downloadCapturedPhoto,
+  goToGalleryFromAR,
+  shareCapturedPhoto,
   openTargetsModal,
   closeTargetsModal,
   viewDetectedTeamHistory,
   toggleARFullscreen,
   toggleARMirroring
 } from './modules/arViewer.js';
+import {
+  renderGallery,
+  filterGallery,
+  openGalleryItemModal,
+  closeGalleryItemModal,
+  downloadGalleryItem,
+  deleteGalleryItemById,
+  confirmClearGallery
+} from './modules/gallery.js';
 import { initGameCanvas, startGame, stopGame, swingBat, gameState } from './modules/battingGame.js';
 import { loadLiveStandings, filterDivisionTable } from './modules/standings.js';
 import { initNewTriviaGame } from './modules/trivia.js';
@@ -46,11 +67,18 @@ window.setProfileTab = setProfileTab;
 window.claimTestCoins = claimTestCoins;
 window.showToastNotification = showToastNotification;
 
+// Reproductor y Filtros de Video + Grabación/Guardado
 window.togglePlayPause = togglePlayPause;
 window.changeVolume = changeVolume;
 window.applyPreset = applyPreset;
 window.updateColorAdjustments = updateColorAdjustments;
+window.toggleVideoRecording = toggleVideoRecording;
+window.recordQuickClip = recordQuickClip;
+window.captureVideoSnapshot = captureVideoSnapshot;
+window.closeVideoSavedModal = closeVideoSavedModal;
+window.downloadAgainRecordedVideo = downloadAgainRecordedVideo;
 
+// Visor AR
 window.openARModal = openARModal;
 window.closeARModal = closeARModal;
 window.arCustomAction = arCustomAction;
@@ -61,11 +89,22 @@ window.arConfettiAction = arConfettiAction;
 window.arTakePhotoAction = arTakePhotoAction;
 window.closePhotoPreview = closePhotoPreview;
 window.downloadCapturedPhoto = downloadCapturedPhoto;
+window.goToGalleryFromAR = goToGalleryFromAR;
+window.shareCapturedPhoto = shareCapturedPhoto;
 window.openTargetsModal = openTargetsModal;
 window.closeTargetsModal = closeTargetsModal;
 window.viewDetectedTeamHistory = viewDetectedTeamHistory;
 window.toggleARFullscreen = toggleARFullscreen;
 window.toggleARMirroring = toggleARMirroring;
+
+// Galería Multimedia Persistente
+window.renderGallery = renderGallery;
+window.filterGallery = filterGallery;
+window.openGalleryItemModal = openGalleryItemModal;
+window.closeGalleryItemModal = closeGalleryItemModal;
+window.downloadGalleryItem = downloadGalleryItem;
+window.deleteGalleryItemById = deleteGalleryItemById;
+window.confirmClearGallery = confirmClearGallery;
 
 window.startGame = startGame;
 window.swingBat = swingBat;
@@ -297,6 +336,7 @@ export function showPage(pageId) {
   if (pageId === 'estadisticas') loadLiveStandings();
   if (pageId === 'tienda') renderStorePage();
   if (pageId === 'perfil') renderProfilePage();
+  if (pageId === 'galeria') renderGallery();
 
   // Actualizar clase activa en barra de navegacion de escritorio
   document.querySelectorAll('.nav-link').forEach(btn => {
@@ -324,6 +364,7 @@ export function showPage(pageId) {
 
   refreshIcons();
 }
+
 export function refreshIcons() {
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
@@ -380,21 +421,6 @@ function renderTeamsHistory() {
       </div>
     `;
   });
-}
-
-function renderGallery() {
-  const galleryGrid = document.getElementById('gallery-grid');
-  if (!galleryGrid) return;
-
-  galleryGrid.innerHTML = '';
-  for (let i = 1; i <= 8; i++) {
-    galleryGrid.innerHTML += `
-      <div class="aspect-square bg-slate-800 rounded-xl border border-slate-700 flex flex-col items-center justify-center text-slate-500 p-4 text-center">
-        <i data-lucide="image" class="w-8 h-8 mb-2"></i>
-        <span class="text-xs">Espacio para Imagen #${i}</span>
-      </div>
-    `;
-  }
 }
 
 const startApp = () => {

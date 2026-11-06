@@ -291,6 +291,12 @@
           
           <!-- PANTALLA DE VIDEO ADAPTABLE PHONE-FIRST -->
           <div class="relative w-full aspect-video sm:h-[360px] max-h-[360px] rounded-2xl overflow-hidden border border-slate-700 bg-black flex items-center justify-center shadow-xl">
+            <!-- Indicador en vivo de grabación -->
+            <div id="video-recording-indicator" class="hidden absolute top-3 left-3 bg-red-600/90 text-white text-xs font-black px-3 py-1.5 rounded-full items-center gap-2 shadow-lg backdrop-blur-md animate-pulse z-20">
+              <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+              <span id="recording-timer-text">00:00</span>
+            </div>
+
             <video id="raw-video" class="w-full h-full block object-contain transition-opacity duration-200" autoplay loop muted playsinline>
               <source src="liga_nacional_presentacion.mp4" type="video/mp4">
             </video>
@@ -347,6 +353,39 @@
                 <input type="range" id="slider-hue" min="0" max="360" value="0" oninput="updateColorAdjustments()" class="w-2/3 accent-orange-500 cursor-pointer">
               </div>
             </div>
+          </div>
+
+          <!-- SECCIÓN DE EXPORTACIÓN Y GUARDADO DE VIDEO -->
+          <div class="w-full mt-4 pt-4 border-t border-slate-800 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="download-cloud" class="w-3.5 h-3.5 text-orange-400"></i>
+                <span>Guardar Video Editado</span>
+              </span>
+              <span class="text-[10px] text-slate-500 font-semibold">WebM / MP4</span>
+            </div>
+
+            <!-- Botón Principal: Grabar / Detener y Guardar -->
+            <button id="btn-record-video" onclick="toggleVideoRecording()" class="w-full bg-red-600 hover:bg-red-500 text-white font-black py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 transition shadow-lg shadow-red-600/25 active:scale-95 cursor-pointer">
+              <i id="icon-record-video" data-lucide="video" class="w-4 h-4"></i>
+              <span id="text-record-video">Grabar Video con Filtros</span>
+            </button>
+
+            <!-- Acciones secundarias rápidas -->
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="recordQuickClip(5)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Clip 5 Segundos</span>
+              </button>
+              <button onclick="captureVideoSnapshot()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-rose-400"></i>
+                <span>Capturar Foto</span>
+              </button>
+            </div>
+
+            <p class="text-[11px] text-slate-400 text-center">
+              Los videos y capturas se descargan y se guardan en tu <a href="javascript:void(0)" onclick="showPage('galeria')" class="text-rose-400 hover:underline font-bold">Galería</a>.
+            </p>
           </div>
 
         </div>
@@ -590,10 +629,45 @@
       <div id="teams-history-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- SECCIÓN GALERÍA -->
+    <!-- SECCIÓN GALERÍA MULTIMEDIA -->
     <section id="page-galeria" class="page-content hidden space-y-6">
-      <h2 class="text-2xl font-black text-rose-400">Galería de Imágenes</h2>
-      <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+      <!-- Encabezado con estadísticas y controles -->
+      <div class="relative bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 p-6 sm:p-7 rounded-3xl border border-rose-500/30 shadow-2xl overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="space-y-2">
+          <div class="inline-flex items-center space-x-2 bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-full text-xs font-bold text-rose-400">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+            <span>Colección Multimedia Oficial</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">Galería de Capturas y Videos</h2>
+            <span id="gallery-count-badge" class="text-xs bg-slate-950/80 text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full font-bold">
+              0 elementos
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-xl">
+            Tus fotos tomadas a los modelos 3D en Realidad Aumentada y tus videos grabados con filtros se guardan aquí permanentemente.
+          </p>
+        </div>
+
+        <!-- Barra de filtros y acciones -->
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <button id="btn-filter-all" onclick="filterGallery('all')" class="px-3.5 py-1.5 rounded-xl text-xs font-black transition bg-orange-500 text-slate-950 shadow-md shadow-orange-500/25">
+            Todos (0)
+          </button>
+          <button id="btn-filter-photos" onclick="filterGallery('photo')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/60">
+            📸 Fotos (0)
+          </button>
+          <button id="btn-filter-videos" onclick="filterGallery('video')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700/60">
+            🎬 Videos (0)
+          </button>
+          <button onclick="confirmClearGallery()" class="p-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700/60 transition ml-auto md:ml-2" title="Vaciar toda la galería">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuadrícula Dinámica de la Galería -->
+      <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
     </section>
 
     <!-- SECCIÓN AUTENTICACIÓN -->
@@ -867,29 +941,49 @@
 
   <!-- MODAL DE VISTA PREVIA DE FOTO CAPTURADA -->
   <div id="photo-preview-modal" class="fixed inset-0 bg-slate-950/95 z-[70] hidden flex-col items-center justify-center p-4">
-    <div class="relative w-full max-w-2xl bg-slate-900 rounded-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+    <div class="relative w-full max-w-2xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800">
         <h3 class="font-bold flex items-center space-x-2 text-base text-slate-100">
           <i data-lucide="image" class="text-rose-400"></i>
-          <span>Vista Previa de la Foto</span>
+          <span>Foto Capturada en Realidad Aumentada</span>
         </h3>
         <button onclick="closePhotoPreview()" class="p-1 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition">
           <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
 
-      <div class="relative flex-1 bg-black p-3 flex items-center justify-center overflow-hidden">
-        <img id="photo-preview-img" src="" alt="Captura AR" class="max-h-[60vh] w-auto rounded-xl border border-slate-800 object-contain shadow-lg">
+      <!-- Barra de confirmación de guardado en la galería -->
+      <div class="px-4 py-2.5 bg-emerald-500/15 border-b border-emerald-500/30 flex items-center justify-between text-xs font-bold text-emerald-300">
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>¡Guardada automáticamente en tu Galería!</span>
+        </div>
+        <button onclick="window.goToGalleryFromAR()" class="text-emerald-300 hover:text-white underline flex items-center gap-1 font-black">
+          <span>Abrir Galería</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
       </div>
 
-      <div class="p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap gap-3 justify-end items-center">
-        <button onclick="closePhotoPreview()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center space-x-2">
+      <div class="relative flex-1 bg-black p-3 flex items-center justify-center overflow-hidden">
+        <img id="photo-preview-img" src="" alt="Captura AR" class="max-h-[58vh] w-auto rounded-xl border border-slate-800 object-contain shadow-lg">
+      </div>
+
+      <div class="p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap gap-2.5 justify-end items-center">
+        <button onclick="closePhotoPreview()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
-          <span>Regresar a la Cámara</span>
+          <span>Seguir en Cámara</span>
         </button>
-        <button onclick="downloadCapturedPhoto()" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center space-x-2 shadow-lg shadow-orange-500/20">
+        <button onclick="window.goToGalleryFromAR()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-rose-600/20">
+          <i data-lucide="image" class="w-4 h-4"></i>
+          <span>Ver en Galería</span>
+        </button>
+        <button id="btn-share-captured-photo" onclick="window.shareCapturedPhoto()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition items-center space-x-1.5 shadow-lg shadow-indigo-600/20">
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          <span>Compartir</span>
+        </button>
+        <button onclick="downloadCapturedPhoto()" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-orange-500/20">
           <i data-lucide="download" class="w-4 h-4"></i>
-          <span>Guardar en Dispositivo</span>
+          <span>Descargar Foto</span>
         </button>
       </div>
     </div>
@@ -958,6 +1052,87 @@
     </div>
   </div>
 
+  <!-- MODAL DE VIDEO GUARDADO CON FILTROS -->
+  <div id="video-saved-modal" class="fixed inset-0 bg-slate-950/95 z-[75] hidden flex-col items-center justify-center p-4 backdrop-blur-md">
+    <div class="relative w-full max-w-2xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden flex flex-col max-h-[92vh] shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800">
+        <h3 class="font-bold flex items-center space-x-2 text-base text-slate-100">
+          <i data-lucide="video" class="text-amber-400"></i>
+          <span>Video Editado Guardado</span>
+        </h3>
+        <button onclick="window.closeVideoSavedModal()" class="p-1 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Barra de confirmación -->
+      <div class="px-4 py-2.5 bg-emerald-500/15 border-b border-emerald-500/30 flex items-center justify-between text-xs font-bold text-emerald-300">
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>¡Video guardado en tu Galería y descargado a tu dispositivo!</span>
+        </div>
+      </div>
+
+      <div class="relative flex-1 bg-black p-3 flex flex-col items-center justify-center overflow-hidden">
+        <video id="video-saved-player" controls autoplay loop playsinline class="max-h-[55vh] w-auto rounded-xl border border-slate-800 shadow-xl bg-black"></video>
+        <div id="video-saved-info" class="text-xs text-slate-400 mt-2 text-center flex flex-wrap justify-center gap-2"></div>
+      </div>
+
+      <div class="p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap gap-2.5 justify-end items-center">
+        <button onclick="window.closeVideoSavedModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5">
+          <span>Cerrar</span>
+        </button>
+        <button onclick="window.closeVideoSavedModal(); window.showPage('galeria')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-rose-600/20">
+          <i data-lucide="image" class="w-4 h-4"></i>
+          <span>Ver en la Galería</span>
+        </button>
+        <button onclick="window.downloadAgainRecordedVideo()" class="bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1.5 shadow-lg shadow-orange-500/20">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Descargar de Nuevo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE VISUALIZACIÓN COMPLETA DE ELEMENTO DE GALERÍA -->
+  <div id="gallery-item-modal" class="fixed inset-0 bg-slate-950/98 z-[80] hidden flex-col items-center justify-center p-3 sm:p-5 backdrop-blur-md">
+    <div class="relative w-full max-w-4xl bg-slate-900 rounded-3xl border border-slate-700 overflow-hidden flex flex-col max-h-[92vh] shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/80">
+        <div class="flex items-center space-x-3">
+          <div id="gallery-item-badge"></div>
+          <div>
+            <h4 id="gallery-item-title" class="font-black text-sm sm:text-base text-slate-100"></h4>
+            <p id="gallery-item-date" class="text-[11px] text-slate-400"></p>
+          </div>
+        </div>
+        <button onclick="window.closeGalleryItemModal()" class="p-1.5 hover:bg-slate-700 rounded-xl text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="gallery-item-content" class="p-3 sm:p-5 bg-black flex items-center justify-center min-h-[300px] max-h-[68vh] overflow-hidden">
+        <!-- Contenido dinámico (imagen o video) -->
+      </div>
+
+      <div class="p-3.5 sm:p-4 bg-slate-800 border-t border-slate-700 flex flex-wrap justify-between items-center gap-2">
+        <button onclick="window.deleteGalleryItemById()" class="px-3.5 py-2 bg-slate-700/80 hover:bg-rose-600 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Eliminar de Galería</span>
+        </button>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="window.closeGalleryItemModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-xs font-bold transition">
+            Volver
+          </button>
+          <button onclick="window.downloadGalleryItem()" class="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-slate-900 rounded-xl text-xs font-black transition flex items-center space-x-1.5 shadow-lg shadow-orange-500/20">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Descargar Archivo</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Inicializador de Lucide Icons -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -966,6 +1141,6 @@
       }
     });
   </script>
-  <script type="module" src="./js/main.js?v=20261025_06"></script>
+  <script type="module" src="./js/main.js?v=20261105_01"></script>
 </body>
 </html>

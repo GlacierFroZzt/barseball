@@ -1,4 +1,7 @@
 // Módulo de Realidad Aumentada (MindAR + A-Frame) - 15 Equipos Liga Nacional
+import { saveGalleryItem } from './galleryStorage.js';
+import { showToastNotification } from './store.js';
+
 export const ASSET_VERSION = '20261025_06';
 
 const STORAGE_KEY_AR_MIRROR = 'barseball_ar_mirrored';
@@ -12,6 +15,7 @@ let isPerformingAction = false;
 let particlesVisible = true;
 let localConfettiInstance = null;
 let currentPhotoDataUrl = null;
+let currentPhotoBlob = null;
 let currentDetectedTeam = null;
 
 // Registro de componentes A-Frame
@@ -536,6 +540,42 @@ export function arTakePhotoAction() {
   previewImg.src = currentPhotoDataUrl;
   previewModal.classList.remove('hidden');
   previewModal.classList.add('flex');
+
+  // Guardar automáticamente la foto en la Galería (IndexedDB)
+  const teamName = currentDetectedTeam ? currentDetectedTeam.name : 'Modelo 3D Liga Nacional';
+  const teamSlug = currentDetectedTeam ? currentDetectedTeam.slug : null;
+
+  captureCanvas.toBlob(async (blob) => {
+    currentPhotoBlob = blob;
+    try {
+      await saveGalleryItem({
+        type: 'photo',
+        dataUrl: currentPhotoDataUrl,
+        blob: blob,
+        title: `Captura AR: ${teamName}`,
+        metadata: {
+          team: teamName,
+          slug: teamSlug
+        }
+      });
+      showToastNotification(`📸 ¡Captura de ${teamName} guardada en tu Galería!`, 'success');
+    } catch (err) {
+      console.warn('Error al guardar foto en la galería:', err);
+    }
+  }, 'image/png');
+
+  // Si el navegador soporta compartir archivos directamente (móviles Android / iOS)
+  const btnShare = document.getElementById('btn-share-captured-photo');
+  if (btnShare) {
+    if (navigator.canShare) {
+      btnShare.classList.remove('hidden');
+      btnShare.classList.add('flex');
+    } else {
+      btnShare.classList.add('hidden');
+      btnShare.classList.remove('flex');
+    }
+  }
+
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
   }
@@ -558,6 +598,45 @@ export function downloadCapturedPhoto() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  showToastNotification('📥 Descargando captura de imagen...', 'info');
+}
+
+export function goToGalleryFromAR() {
+  closePhotoPreview();
+  closeARModal();
+  if (typeof window.showPage === 'function') {
+    window.showPage('galeria');
+  }
+}
+
+export async function shareCapturedPhoto() {
+  if (!currentPhotoBlob && currentPhotoDataUrl) {
+    try {
+      const res = await fetch(currentPhotoDataUrl);
+      currentPhotoBlob = await res.blob();
+    } catch (e) {}
+  }
+
+  if (currentPhotoBlob && navigator.canShare) {
+    const file = new File([currentPhotoBlob], `bARseball_captura_${Date.now()}.png`, { type: 'image/png' });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Captura AR - bARseball',
+          text: '¡Mira mi captura 3D en Realidad Aumentada de bARseball!'
+        });
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.warn('Error al compartir:', err);
+        }
+      }
+    }
+  }
+
+  // Fallback si no está disponible o el usuario canceló
+  downloadCapturedPhoto();
 }
 
 // Modal para Visualizar y Descargar las 15 Tarjetas (1280x720)
