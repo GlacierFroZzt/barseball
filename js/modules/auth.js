@@ -317,7 +317,7 @@ export function updateAuthUI() {
       container.innerHTML = `
         <div class="flex items-center space-x-2">
           <!-- Balance de monedas en navbar -->
-          <div onclick="showPage('tienda')" title="Ir a la Tienda de Cosméticos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
+          <div onclick="showPage('tienda')" title="Ir a la Tienda de Artículos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
             <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
             <span id="nav-coins-count" class="font-mono text-amber-300 font-black">${user.coins}</span>
           </div>
@@ -347,7 +347,7 @@ export function updateAuthUI() {
       container.innerHTML = `
         <div class="flex items-center space-x-2">
           <!-- Balance de monedas en navbar para invitado -->
-          <div onclick="showPage('tienda')" title="Ir a la Tienda de Cosméticos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
+          <div onclick="showPage('tienda')" title="Ir a la Tienda de Artículos" class="flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs sm:text-sm font-bold shadow-sm cursor-pointer transition">
             <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
             <span id="nav-coins-count" class="font-mono text-amber-300 font-black">${user.coins}</span>
           </div>

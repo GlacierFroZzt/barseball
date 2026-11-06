@@ -1,4 +1,4 @@
-// Módulo de Tienda de Cosméticos, Inventario y Perfil
+// Módulo de Tienda de Artículos, Inventario y Perfil
 import { getActiveUser, updateActiveUser, addCoins } from './auth.js';
 
 export const COSMETICS_CATALOG = {
@@ -246,7 +246,7 @@ export function renderStorePage() {
 }
 
 // ---------------------------------------------------------------------
-// COMPRAR Y EQUIPAR COSMÉTICOS
+// COMPRAR Y EQUIPAR ARTÍCULOS
 // ---------------------------------------------------------------------
 export function buyCosmetic(type, itemId) {
   const user = getActiveUser();
@@ -309,7 +309,7 @@ export function renderProfilePage() {
   const inventoryContainer = document.getElementById('profile-inventory-container');
   if (!cardContainer || !inventoryContainer) return;
 
-  // Cosméticos equipados actuales
+  // Artículos equipados actuales
   const avatar = getCosmeticItem('avatars', user.equipped.avatar) || COSMETICS_CATALOG.avatars[0];
   const frame = getCosmeticItem('frames', user.equipped.frame) || COSMETICS_CATALOG.frames[0];
   const title = getCosmeticItem('titles', user.equipped.title) || COSMETICS_CATALOG.titles[0];
@@ -327,7 +327,7 @@ export function renderProfilePage() {
           <div class="w-28 h-28 rounded-full bg-gradient-to-tr ${avatar.gradient} flex items-center justify-center text-5xl shadow-xl ${frame.borderClass} transition-all">
             ${avatar.iconEmoji}
           </div>
-          <div class="absolute -bottom-2 -right-2 bg-slate-900 border border-slate-700 rounded-full p-1.5 shadow-md text-amber-400" title="Cosmético Equipado">
+          <div class="absolute -bottom-2 -right-2 bg-slate-900 border border-slate-700 rounded-full p-1.5 shadow-md text-amber-400" title="Artículo Equipado">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
           </div>
         </div>
@@ -378,7 +378,7 @@ export function renderProfilePage() {
         <div class="mt-6 p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-orange-200">
           <div class="flex items-center space-x-2">
             <i data-lucide="info" class="w-5 h-5 text-orange-400 shrink-0"></i>
-            <span>Estás jugando como invitado. <strong>Crea una cuenta</strong> para conservar tus cosméticos y carreras de forma segura.</span>
+            <span>Estás jugando como invitado. <strong>Crea una cuenta</strong> para conservar tus artículos y carreras de forma segura.</span>
           </div>
           <button onclick="showPage('login')" class="bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold px-4 py-2 rounded-xl transition whitespace-nowrap">
             Crear Cuenta / Iniciar

@@ -53,7 +53,7 @@ window.handleAuthSubmit = handleAuthSubmit;
 window.toggleAuthTab = toggleAuthTab;
 window.logoutUser = logoutUser;
 
-// Tienda, Cosméticos y Recompensas
+// Tienda, Artículos y Recompensas
 window.addCoins = addCoins;
 window.recordGameStats = recordGameStats;
 window.getActiveUser = getActiveUser;
