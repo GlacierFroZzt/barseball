@@ -320,6 +320,23 @@ export function showPage(pageId) {
     stopGame();
   }
 
+  // Si estaba en pantalla completa y navega a otra sección, salir de fullscreen
+  if (pageId !== 'juego' && document.fullscreenElement) {
+    try { document.exitFullscreen().catch(() => {}); } catch (e) {}
+  }
+
+  // Visibilidad del botón flotante global para volver al inicio
+  const floatingHomeBtn = document.getElementById('floating-btn-home');
+  if (floatingHomeBtn) {
+    if (pageId === 'inicio') {
+      floatingHomeBtn.classList.add('hidden');
+      floatingHomeBtn.classList.remove('flex');
+    } else {
+      floatingHomeBtn.classList.remove('hidden');
+      floatingHomeBtn.classList.add('flex');
+    }
+  }
+
   if (pageId === 'juego') {
     setTimeout(initGameCanvas, 50);
     setTimeout(() => {
@@ -432,6 +449,14 @@ const startApp = () => {
   renderTeamsHistory();
   renderGallery();
   loadLiveStandings();
+
+  // Asegurar estado inicial del botón flotante de inicio
+  const floatingHomeBtn = document.getElementById('floating-btn-home');
+  if (floatingHomeBtn) {
+    floatingHomeBtn.classList.add('hidden');
+    floatingHomeBtn.classList.remove('flex');
+  }
+
   refreshIcons();
 };
 
